@@ -1,5 +1,5 @@
-// Motorola Investment App Service Worker
-const CACHE_NAME = 'motorola-app-v3.8.4';
+// YAMAHA INVESTMENT EARNINGS INCOME Service Worker
+const CACHE_NAME = 'yamaha-app-v3.8.4';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();

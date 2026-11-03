@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import yamahaBrandLogo from '../assets/images/yamaha_brand_logo_1793646961486.jpg';
 import { soundService } from '../utils/sound';
-import { downloadMotorolaApk, triggerHomeScreenInstall } from '../utils/apkDownloader';
+import { downloadYamahaApk, triggerHomeScreenInstall } from '../utils/apkDownloader';
 
 interface InstallAppModalProps {
   isOpen: boolean;
@@ -69,7 +69,7 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({ isOpen, onClos
     setDownloadProgress(25);
     setDownloadCompleted(false);
 
-    downloadMotorolaApk({
+    downloadYamahaApk({
       onProgress: (p) => {
         setDownloadProgress(p);
       },

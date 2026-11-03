@@ -33,7 +33,7 @@ export const SupportModal: React.FC<SupportModalProps> = ({
           <div className="w-14 h-14 bg-sky-50 text-sky-700 border-2 border-sky-200 rounded-2xl flex items-center justify-center mx-auto mb-2 shadow-xs">
             <Headset className="w-8 h-8" />
           </div>
-          <h3 className="font-black text-lg text-slate-900">Motorola Customer Support</h3>
+          <h3 className="font-black text-lg text-slate-900">YAMAHA Customer Support</h3>
           <p className="text-xs text-slate-500 font-semibold">24/7 Official Representative Assistance</p>
         </div>
 
@@ -61,7 +61,7 @@ export const SupportModal: React.FC<SupportModalProps> = ({
 
           {/* WhatsApp Support */}
           <a
-            href={`https://wa.me/${adminSettings.supportWhatsApp.replace(/\D/g, '')}?text=Hello%20Motorola%20Support,%20I%20need%20assistance.`}
+            href={`https://wa.me/${adminSettings.supportWhatsApp.replace(/\D/g, '')}?text=Hello%20Yamaha%20Support,%20I%20need%20assistance.`}
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => soundService.playClick()}
@@ -104,7 +104,7 @@ export const SupportModal: React.FC<SupportModalProps> = ({
 
         <div className="mt-5 p-3 rounded-2xl bg-sky-50/60 text-[11px] text-slate-600 font-medium flex items-center gap-2 border border-sky-100">
           <Shield className="w-4 h-4 text-emerald-600 shrink-0" />
-          <span>Motorola Customer Service operates 24 hours daily. Beware of scammers offering unauthorized investment accounts.</span>
+          <span>YAMAHA Customer Service operates 24 hours daily. Beware of scammers offering unauthorized investment accounts.</span>
         </div>
       </div>
     </div>

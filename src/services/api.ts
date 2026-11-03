@@ -71,19 +71,21 @@ async function requestJson<T>(
   }
 
   console.warn(`Network fetch failed for ${url} after ${maxRetries + 1} attempts:`, lastError);
-  throw new Error('Unable to connect to Motorola server. Please check your internet connection.');
+  throw new Error('Unable to connect to YAMAHA server. Please check your internet connection.');
 }
 
 // LocalStorage registry helper functions for zero data loss
-const STORAGE_KEY_REGISTRY = 'motorola_permanent_user_registry';
-const STORAGE_KEY_SETTINGS = 'motorola_admin_settings_cache';
-const STORAGE_KEY_TX_REGISTRY = 'motorola_permanent_transaction_registry';
-const STORAGE_KEY_INV_REGISTRY = 'motorola_permanent_investments_v2';
-const STORAGE_KEY_DELETED_INV_REGISTRY = 'motorola_deleted_investment_ids_v2';
+const STORAGE_KEY_REGISTRY = 'yamaha_permanent_user_registry';
+const STORAGE_KEY_SETTINGS = 'yamaha_admin_settings_cache';
+const STORAGE_KEY_TX_REGISTRY = 'yamaha_permanent_transaction_registry';
+const STORAGE_KEY_INV_REGISTRY = 'yamaha_permanent_investments_v2';
+const STORAGE_KEY_DELETED_INV_REGISTRY = 'yamaha_deleted_investment_ids_v2';
 
 export function getDeletedInvestmentIds(): string[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY_DELETED_INV_REGISTRY);
+    const raw =
+      localStorage.getItem(STORAGE_KEY_DELETED_INV_REGISTRY) ||
+      localStorage.getItem('motorola_deleted_investment_ids_v2');
     const list = raw ? JSON.parse(raw) : [];
     return Array.isArray(list) ? list : [];
   } catch (e) {
@@ -178,7 +180,9 @@ export function saveInvestmentsBatchToLocalRegistry(invs: Investment[]) {
 export function getLocalInvestments(): Investment[] {
   try {
     const deletedIds = getDeletedInvestmentIds();
-    const raw = localStorage.getItem(STORAGE_KEY_INV_REGISTRY);
+    const raw =
+      localStorage.getItem(STORAGE_KEY_INV_REGISTRY) ||
+      localStorage.getItem('motorola_permanent_investments_v2');
     const list: Investment[] = raw ? JSON.parse(raw) : [];
     return Array.isArray(list) ? list.filter((i) => i && i.id && !deletedIds.includes(i.id)) : [];
   } catch (e) {
@@ -216,7 +220,7 @@ export function saveUserToLocalRegistry(user: User) {
       registry.push(user);
     }
     localStorage.setItem(STORAGE_KEY_REGISTRY, JSON.stringify(registry));
-    localStorage.setItem(`motorola_user_profile_${user.id}`, JSON.stringify(user));
+    localStorage.setItem(`yamaha_user_profile_${user.id}`, JSON.stringify(user));
   } catch (e) {
     console.warn('LocalStorage saveUser note:', e);
   }
@@ -245,7 +249,9 @@ export function saveUsersBatchToLocalRegistry(users: User[]) {
 
 export function getLocalRegisteredUsers(): User[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY_REGISTRY);
+    const raw =
+      localStorage.getItem(STORAGE_KEY_REGISTRY) ||
+      localStorage.getItem('motorola_permanent_user_registry');
     return raw ? JSON.parse(raw) : [];
   } catch (e) {
     return [];
@@ -255,12 +261,15 @@ export function getLocalRegisteredUsers(): User[] {
 export function removeUserFromLocalRegistry(userIdOrPhone: string) {
   if (!userIdOrPhone) return;
   try {
-    const raw = localStorage.getItem(STORAGE_KEY_REGISTRY);
+    const raw =
+      localStorage.getItem(STORAGE_KEY_REGISTRY) ||
+      localStorage.getItem('motorola_permanent_user_registry');
     const registry: User[] = raw ? JSON.parse(raw) : [];
     const filtered = registry.filter(
       (u) => u.id !== userIdOrPhone && u.phone !== userIdOrPhone
     );
     localStorage.setItem(STORAGE_KEY_REGISTRY, JSON.stringify(filtered));
+    localStorage.removeItem(`yamaha_user_profile_${userIdOrPhone}`);
     localStorage.removeItem(`motorola_user_profile_${userIdOrPhone}`);
   } catch (e) {
     console.warn('LocalStorage removeUser note:', e);
@@ -1496,7 +1505,7 @@ export class ApiService {
       const invs = getLocalInvestments();
       return {
         status: 'online',
-        databaseEngine: 'Motorola Permanent Ledger',
+        databaseEngine: 'Yamaha Permanent Ledger',
         usersCount: users.length,
         transactionsCount: txs.length,
         investmentsCount: invs.length,
@@ -1529,7 +1538,7 @@ export class ApiService {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `motorola_permanent_db_${Date.now()}.json`;
+    a.download = `yamaha_permanent_db_${Date.now()}.json`;
     document.body.appendChild(a);
     a.click();
     window.URL.revokeObjectURL(url);

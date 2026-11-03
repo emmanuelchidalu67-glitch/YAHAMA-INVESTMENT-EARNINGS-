@@ -1271,7 +1271,8 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguageState] = useState<LanguageCode>(() => {
     try {
-      const saved = localStorage.getItem('motorola_language');
+      const saved =
+        localStorage.getItem('yamaha_language') || localStorage.getItem('motorola_language');
       if (saved && SUPPORTED_LANGUAGES.some((l) => l.code === saved)) {
         return saved as LanguageCode;
       }
@@ -1282,6 +1283,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const setLanguage = (lang: LanguageCode) => {
     setLanguageState(lang);
     try {
+      localStorage.setItem('yamaha_language', lang);
       localStorage.setItem('motorola_language', lang);
     } catch (e) {}
   };

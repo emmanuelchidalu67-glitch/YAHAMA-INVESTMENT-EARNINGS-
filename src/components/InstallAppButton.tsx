@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import yamahaBrandLogo from '../assets/images/yamaha_brand_logo_1793646961486.jpg';
 import { InstallAppModal } from './InstallAppModal';
-import { downloadMotorolaApk, triggerHomeScreenInstall } from '../utils/apkDownloader';
+import { downloadYamahaApk, triggerHomeScreenInstall } from '../utils/apkDownloader';
 import { soundService } from '../utils/sound';
 
 interface InstallAppButtonProps {
@@ -29,7 +29,7 @@ export const InstallAppButton: React.FC<InstallAppButtonProps> = ({
     try {
       await triggerHomeScreenInstall();
     } catch (_) {}
-    downloadMotorolaApk().catch(() => {});
+    downloadYamahaApk().catch(() => {});
     setModalOpen(true);
   };
 

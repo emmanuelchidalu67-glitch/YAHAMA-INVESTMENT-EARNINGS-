@@ -53,12 +53,16 @@ export default function App() {
 
   // Dark Mode State
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
-    return localStorage.getItem('motorola_theme') === 'dark';
+    return (
+      localStorage.getItem('yamaha_theme') === 'dark' ||
+      localStorage.getItem('motorola_theme') === 'dark'
+    );
   });
 
   const handleToggleDarkMode = () => {
     setIsDarkMode((prev) => {
       const next = !prev;
+      localStorage.setItem('yamaha_theme', next ? 'dark' : 'light');
       localStorage.setItem('motorola_theme', next ? 'dark' : 'light');
       if (next) {
         document.documentElement.classList.add('dark');
@@ -119,6 +123,7 @@ export default function App() {
         if (data.adminSettings) {
           setAdminSettings(data.adminSettings);
           try {
+            localStorage.setItem('yamaha_admin_settings_cache', JSON.stringify(data.adminSettings));
             localStorage.setItem('motorola_admin_settings_cache', JSON.stringify(data.adminSettings));
           } catch (e) {}
         }
@@ -127,7 +132,8 @@ export default function App() {
       .catch((err) => console.error('Failed to load public settings:', err));
 
     // 2. Restore saved user session if logged in
-    const savedUserId = localStorage.getItem('motorola_user_id');
+    const savedUserId =
+      localStorage.getItem('yamaha_user_id') || localStorage.getItem('motorola_user_id');
     if (savedUserId) {
       ApiService.getProfile(savedUserId)
         .then((res) => {
@@ -137,6 +143,7 @@ export default function App() {
             if (res.adminSettings) {
               setAdminSettings(res.adminSettings);
               try {
+                localStorage.setItem('yamaha_admin_settings_cache', JSON.stringify(res.adminSettings));
                 localStorage.setItem('motorola_admin_settings_cache', JSON.stringify(res.adminSettings));
               } catch (e) {}
             }
@@ -149,7 +156,9 @@ export default function App() {
               })
               .catch(() => {});
             // Show community popup if not dismissed in current session
-            const hasDismissedCommunity = sessionStorage.getItem('motorola_community_dismissed');
+            const hasDismissedCommunity =
+              sessionStorage.getItem('yamaha_community_dismissed') ||
+              sessionStorage.getItem('motorola_community_dismissed');
             if (!hasDismissedCommunity) {
               setCommunityModalOpen(true);
             }
@@ -162,6 +171,7 @@ export default function App() {
             setUser(localMatch);
             ApiService.syncClientData({ users: [localMatch] }).catch(() => {});
           } else {
+            localStorage.removeItem('yamaha_user_id');
             localStorage.removeItem('motorola_user_id');
             setUser(null);
           }
@@ -169,7 +179,9 @@ export default function App() {
     }
 
     // 3. Auto-trigger Guided Tour for first-time users
-    const hasCompletedTour = localStorage.getItem('motorola_tour_completed');
+    const hasCompletedTour =
+      localStorage.getItem('yamaha_tour_completed') ||
+      localStorage.getItem('motorola_tour_completed');
     if (!hasCompletedTour) {
       const timer = setTimeout(() => {
         setTourOpen(true);
@@ -274,6 +286,7 @@ export default function App() {
   const handleAuthSuccess = (authenticatedUser: User) => {
     setUser(authenticatedUser);
     saveUserToLocalRegistry(authenticatedUser);
+    localStorage.setItem('yamaha_user_id', authenticatedUser.id);
     localStorage.setItem('motorola_user_id', authenticatedUser.id);
     setAuthOpen(false);
 
@@ -292,6 +305,7 @@ export default function App() {
 
   const handleSignOut = () => {
     setUser(null);
+    localStorage.removeItem('yamaha_user_id');
     localStorage.removeItem('motorola_user_id');
     setShowAdmin(false);
     setShowHistory(false);
@@ -424,6 +438,7 @@ export default function App() {
             onUpdateSettings={(newSettings) => {
               setAdminSettings(newSettings);
               try {
+                localStorage.setItem('yamaha_admin_settings_cache', JSON.stringify(newSettings));
                 localStorage.setItem('motorola_admin_settings_cache', JSON.stringify(newSettings));
               } catch (e) {}
             }}

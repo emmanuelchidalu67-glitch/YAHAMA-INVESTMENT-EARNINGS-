@@ -284,7 +284,7 @@ export const AdminView: React.FC<AdminViewProps> = ({ user, onRequireAuth, onClo
         Admin_Note: d.adminNote || '',
         Date: new Date(d.createdAt).toLocaleString(),
       }));
-      filename = `motorola_deposits_ledger_${Date.now()}.csv`;
+      filename = `yamaha_deposits_ledger_${Date.now()}.csv`;
     } else if (exportType === 'withdrawals') {
       rows = withdrawals.map((w) => ({
         Transaction_ID: w.id,
@@ -298,7 +298,7 @@ export const AdminView: React.FC<AdminViewProps> = ({ user, onRequireAuth, onClo
         Admin_Note: w.adminNote || '',
         Date: new Date(w.createdAt).toLocaleString(),
       }));
-      filename = `motorola_withdrawals_ledger_${Date.now()}.csv`;
+      filename = `yamaha_withdrawals_ledger_${Date.now()}.csv`;
     } else if (exportType === 'investments') {
       rows = allInvestments.map((i) => ({
         Investment_ID: i.id,
@@ -315,7 +315,7 @@ export const AdminView: React.FC<AdminViewProps> = ({ user, onRequireAuth, onClo
         Purchased_At: new Date(i.purchasedAt).toLocaleString(),
         Next_Settlement: new Date(i.nextSettlementTimestamp).toLocaleString(),
       }));
-      filename = `motorola_30day_investments_ledger_${Date.now()}.csv`;
+      filename = `yamaha_30day_investments_ledger_${Date.now()}.csv`;
     } else {
       rows = allTransactions.map((t) => ({
         Transaction_ID: t.id,
@@ -326,7 +326,7 @@ export const AdminView: React.FC<AdminViewProps> = ({ user, onRequireAuth, onClo
         Admin_Note: t.adminNote || '',
         Date: new Date(t.createdAt).toLocaleString(),
       }));
-      filename = `motorola_complete_financial_ledger_${Date.now()}.csv`;
+      filename = `yamaha_complete_financial_ledger_${Date.now()}.csv`;
     }
 
     if (!rows.length) {
@@ -916,7 +916,7 @@ export const AdminView: React.FC<AdminViewProps> = ({ user, onRequireAuth, onClo
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `motorola_users_registry_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `yamaha_users_registry_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

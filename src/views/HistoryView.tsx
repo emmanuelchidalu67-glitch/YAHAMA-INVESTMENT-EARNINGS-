@@ -65,7 +65,9 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ user, onRequireAuth })
         });
       }
     };
+    window.addEventListener('yamaha_live_update', handleLiveSync);
     window.addEventListener('motorola_live_update', handleLiveSync);
+    window.addEventListener('yamaha_transaction_created', handleCreated);
     window.addEventListener('motorola_transaction_created', handleCreated);
 
     // Fast background refresh every 2.5s for instant status change
@@ -82,7 +84,9 @@ export const HistoryView: React.FC<HistoryViewProps> = ({ user, onRequireAuth })
     }, 2500);
 
     return () => {
+      window.removeEventListener('yamaha_live_update', handleLiveSync);
       window.removeEventListener('motorola_live_update', handleLiveSync);
+      window.removeEventListener('yamaha_transaction_created', handleCreated);
       window.removeEventListener('motorola_transaction_created', handleCreated);
       clearInterval(interval);
     };

@@ -43,14 +43,14 @@ export const GuidedTourModal: React.FC<GuidedTourModalProps> = ({
 
   const tourSteps: TourStep[] = [
     {
-      title: 'Welcome to Motorola PalmPay!',
+      title: 'Welcome to YAMAHA Investment!',
       badge: 'Step 1 of 4 • Overview',
-      subtitle: 'Your high-yield Motorola investment and daily return platform.',
+      subtitle: 'Your high-yield YAMAHA investment and daily return platform.',
       icon: <Sparkles className="w-8 h-8 text-amber-300" />,
       highlights: [
         'Get ₦700 instantly on registration as welcome bonus',
         'Claim free ₦50 daily check-in rewards every 24 hours',
-        'Spin the Motorola Fortune Wheel to win cash up to ₦10,000',
+        'Spin the YAMAHA Fortune Wheel to win cash up to ₦10,000',
       ],
       tabTarget: 'home',
     },
@@ -60,9 +60,9 @@ export const GuidedTourModal: React.FC<GuidedTourModalProps> = ({
       subtitle: 'Fund your wallet easily via direct bank transfer or voucher codes.',
       icon: <Wallet className="w-8 h-8 text-emerald-300" />,
       highlights: [
-        'Click the "Deposit" button on your balance card',
+        'Click the circular "Deposit" button on your balance card',
         'Copy the verified Admin PalmPay Bank Account details',
-        'Transfer minimum ₦3,000 and enter your transaction reference',
+        'Transfer minimum ₦3,500 and enter your transaction reference',
         'Or redeem instant Free Top-Up Voucher Codes!',
       ],
       tabTarget: 'home',
@@ -73,8 +73,8 @@ export const GuidedTourModal: React.FC<GuidedTourModalProps> = ({
       subtitle: 'Earn guaranteed daily payouts directly credited to your wallet balance.',
       icon: <TrendingUp className="w-8 h-8 text-amber-300" />,
       highlights: [
-        'Choose from Motorola VIP 1 (₦3,000) up to VIP 10 (₦2,000,000)',
-        'Earn daily returns (e.g. VIP 1 pays ₦600 daily for 30 days)',
+        'Choose from YAMAHA VIP 1 (₦3,500) up to VIP 10 (₦2,000,000)',
+        'Earn daily returns (e.g. VIP 1 pays ₦800 daily for 30 days = ₦24,000)',
         'Track active investments and countdown settlement timer live',
       ],
       tabTarget: 'plans',
@@ -86,8 +86,8 @@ export const GuidedTourModal: React.FC<GuidedTourModalProps> = ({
       icon: <UserCheck className="w-8 h-8 text-purple-300" />,
       highlights: [
         'Bind your 10-digit PalmPay or bank account in Profile',
-        'Withdraw minimum ₦1,000 anytime between 8 AM and 6 PM',
-        'Invite friends to earn 20% Tier 1 team commissions!',
+        'Withdraw minimum ₦800 anytime during withdrawal hours',
+        'Invite friends to earn 20% Tier 1 commission across 3 team tiers!',
       ],
       tabTarget: 'profile',
     },
@@ -118,6 +118,7 @@ export const GuidedTourModal: React.FC<GuidedTourModalProps> = ({
   };
 
   const handleFinish = () => {
+    localStorage.setItem('yamaha_tour_completed', 'true');
     localStorage.setItem('motorola_tour_completed', 'true');
     onClose();
   };

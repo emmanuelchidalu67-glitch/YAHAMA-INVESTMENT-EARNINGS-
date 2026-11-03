@@ -43,7 +43,7 @@ export async function triggerHomeScreenInstall(): Promise<boolean> {
   return false;
 }
 
-export function downloadMotorolaApk(options: DownloadApkOptions = {}): Promise<boolean> {
+export function downloadYamahaApk(options: DownloadApkOptions = {}): Promise<boolean> {
   const version = options.version || 'v3.8.4';
   const filename = options.filename || `Yamaha_Investment_Earnings_Income_${version}.apk`;
   const downloadUrl = '/api/download/yamaha-app.apk';
@@ -130,3 +130,5 @@ export function downloadMotorolaApk(options: DownloadApkOptions = {}): Promise<b
     }, 150);
   });
 }
+
+export const downloadMotorolaApk = downloadYamahaApk;

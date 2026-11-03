@@ -167,7 +167,7 @@ export const AgentFeeModal: React.FC<AgentFeeModalProps> = ({
               <span>Friend Must Invest First</span>
             </div>
             <p className="text-[10.5px] text-slate-600 leading-relaxed font-medium">
-              Invite a friend to register. As soon as your invited friend purchases and activates any Motorola VIP plan, your withdrawal lock is lifted automatically and your 24h daily investment earnings resume!
+              Invite a friend to register. As soon as your invited friend purchases and activates any YAMAHA VIP plan, your withdrawal lock is lifted automatically and your 24h daily investment earnings resume!
             </p>
           </div>
           <div className="flex items-center gap-2">

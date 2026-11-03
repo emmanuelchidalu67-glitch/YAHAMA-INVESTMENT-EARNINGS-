@@ -11,7 +11,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import yamahaBrandLogo from '../assets/images/yamaha_brand_logo_1793646961486.jpg';
-import { downloadMotorolaApk, triggerHomeScreenInstall } from '../utils/apkDownloader';
+import { downloadYamahaApk, triggerHomeScreenInstall } from '../utils/apkDownloader';
 import { soundService } from '../utils/sound';
 import { InstallAppModal } from './InstallAppModal';
 
@@ -36,7 +36,7 @@ export const TopInstallBanner: React.FC = () => {
       await triggerHomeScreenInstall();
     } catch (_) {}
     setDownloading(true);
-    downloadMotorolaApk({
+    downloadYamahaApk({
       onProgress: (p) => {},
       onComplete: () => {
         setDownloading(false);

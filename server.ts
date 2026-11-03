@@ -691,7 +691,7 @@ app.post('/api/auth/register', (req, res) => {
     type: 'welcome_bonus',
     amount: welcomeBonus,
     status: 'approved',
-    adminNote: 'Motorola Platform Welcome Registration Bonus',
+    adminNote: 'YAMAHA Platform Welcome Registration Bonus',
     createdAt: new Date().toISOString(),
   });
 
@@ -1193,24 +1193,24 @@ app.post('/api/investments/check-maturity', (req, res) => {
   return res.json({ success: true, deletedInvestmentIds, message: 'Settlement engine executed successfully' });
 });
 
-// Direct APK Download Endpoint (Official Motorola Investment App)
-app.get(['/api/download/motorola.apk', '/download/motorola.apk', '/Motorola_Investment_App_v3.8.4.apk'], (req, res) => {
+// Direct APK Download Endpoint (Official YAMAHA Investment App)
+app.get(['/api/download/motorola.apk', '/download/motorola.apk', '/Motorola_Investment_App_v3.8.4.apk', '/api/download/yamaha.apk'], (req, res) => {
   const version = 'v3.8.4';
-  const filename = `Motorola_Investment_App_${version}.apk`;
+  const filename = `Yamaha_Investment_Earnings_Income_${version}.apk`;
   
   const manifestMeta = JSON.stringify({
-    appName: 'Motorola Investment App',
-    packageName: 'com.motorola.investment.palmpay',
+    appName: 'YAMAHA INVESTMENT EARNINGS INCOME',
+    packageName: 'com.yamaha.investment.earnings.income',
     version: version,
     build: '3840',
     minSdkVersion: 24,
     targetSdkVersion: 34,
-    features: ['24h Yield Engine', 'Instant PalmPay Payouts', 'Biometric Lock', '20% Referral Commission', 'ATM Card Interface'],
+    features: ['24h Yield Engine', 'Instant PalmPay Payouts', 'Biometric Lock', '3-Tier Referral Commission', 'ATM Card Interface'],
     buildDate: new Date().toISOString(),
     verifiedBy: 'Google Play Protect & CAC Nigeria Certified',
   });
 
-  const header = Buffer.from('PK\x03\x04MotorolaInvestmentPackageReleaseV384', 'utf-8');
+  const header = Buffer.from('PK\x03\x04YamahaInvestmentEarningsIncomePackageReleaseV384', 'utf-8');
   const metaBuf = Buffer.from(manifestMeta, 'utf-8');
   const filler = Buffer.alloc(1024 * 64, 0x4d);
   const apkBuffer = Buffer.concat([header, metaBuf, filler]);
@@ -2558,7 +2558,7 @@ app.get('/api/admin/db/health', verifyAdmin, (req, res) => {
 // Admin: Export Full Database JSON
 app.get('/api/admin/db/export', verifyAdmin, (req, res) => {
   res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Content-Disposition', `attachment; filename="motorola_db_backup_${Date.now()}.json"`);
+  res.setHeader('Content-Disposition', `attachment; filename="yamaha_db_backup_${Date.now()}.json"`);
   res.send(JSON.stringify(db, null, 2));
 });
 

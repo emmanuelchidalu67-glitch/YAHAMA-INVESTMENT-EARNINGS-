@@ -1,5 +1,5 @@
 /**
- * Motorola Investment Platform - Tactile Haptic Vibration Engine
+ * YAMAHA INVESTMENT EARNINGS INCOME - Tactile Haptic Vibration Engine
  * Provides tactile confirmation feedback for mobile and touch interactions.
  * Safe fallback for non-supporting browsers and web containers.
  */
