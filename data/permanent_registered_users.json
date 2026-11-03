@@ -1,0 +1,28 @@
+[
+  {
+    "id": "usr_admin_emmanuel",
+    "fullName": "Emmanuel Chidalu (Super Admin)",
+    "phone": "08149021882",
+    "email": "emmanuelchidalu67@gmail.com",
+    "isPhoneVerified": true,
+    "passwordHash": "241166",
+    "referralCode": "MOTO777",
+    "role": "admin",
+    "vipLevel": 10,
+    "balance": 1500000,
+    "totalInvested": 2000000,
+    "totalEarned": 1800000,
+    "totalReferralBonus": 450000,
+    "totalWithdrawn": 600000,
+    "welcomeBonusClaimed": true,
+    "spinsAvailable": 25,
+    "createdAt": "2026-06-01T08:00:00.000Z",
+    "bankAccount": {
+      "bankName": "PalmPay (PalmPay Limited)",
+      "bankCode": "999991",
+      "accountNumber": "8149021882",
+      "accountName": "EMMANUEL CHIDALU ADMIN",
+      "updatedAt": "2026-06-01T08:00:00.000Z"
+    }
+  }
+]

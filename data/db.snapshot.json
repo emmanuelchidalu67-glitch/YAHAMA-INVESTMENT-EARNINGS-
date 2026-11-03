@@ -1,0 +1,274 @@
+{
+  "users": [
+    {
+      "id": "usr_admin_emmanuel",
+      "fullName": "Emmanuel Chidalu (Super Admin)",
+      "phone": "08149021882",
+      "email": "emmanuelchidalu67@gmail.com",
+      "isPhoneVerified": true,
+      "passwordHash": "241166",
+      "referralCode": "MOTO777",
+      "role": "admin",
+      "vipLevel": 10,
+      "balance": 1500000,
+      "totalInvested": 2000000,
+      "totalEarned": 1800000,
+      "totalReferralBonus": 450000,
+      "totalWithdrawn": 600000,
+      "welcomeBonusClaimed": true,
+      "spinsAvailable": 25,
+      "createdAt": "2026-06-01T08:00:00.000Z",
+      "bankAccount": {
+        "bankName": "PalmPay (PalmPay Limited)",
+        "bankCode": "999991",
+        "accountNumber": "8149021882",
+        "accountName": "EMMANUEL CHIDALU ADMIN",
+        "updatedAt": "2026-06-01T08:00:00.000Z"
+      }
+    }
+  ],
+  "plans": [
+    {
+      "id": "vip-1",
+      "level": 1,
+      "name": "Motorola VIP 1",
+      "capital": 3000,
+      "dailyEarning": 600,
+      "durationDays": 30,
+      "totalInvestment": 18000,
+      "badgeColor": "from-purple-600 to-indigo-600",
+      "description": "Basic Starter Package with guaranteed daily returns"
+    },
+    {
+      "id": "vip-2",
+      "level": 2,
+      "name": "Motorola VIP 2",
+      "capital": 5000,
+      "dailyEarning": 1100,
+      "durationDays": 30,
+      "totalInvestment": 33000,
+      "badgeColor": "from-blue-600 to-cyan-600",
+      "description": "Enhanced daily yield for steady financial growth"
+    },
+    {
+      "id": "vip-3",
+      "level": 3,
+      "name": "Motorola VIP 3",
+      "capital": 10000,
+      "dailyEarning": 2300,
+      "durationDays": 30,
+      "totalInvestment": 69000,
+      "badgeColor": "from-emerald-600 to-teal-600",
+      "description": "High-performing portfolio plan for active investors",
+      "popular": true
+    },
+    {
+      "id": "vip-4",
+      "level": 4,
+      "name": "Motorola VIP 4",
+      "capital": 20000,
+      "dailyEarning": 4800,
+      "durationDays": 30,
+      "totalInvestment": 144000,
+      "badgeColor": "from-amber-500 to-yellow-600",
+      "description": "Accelerated capital growth with high payout yield"
+    },
+    {
+      "id": "vip-5",
+      "level": 5,
+      "name": "Motorola VIP 5",
+      "capital": 50000,
+      "dailyEarning": 12500,
+      "durationDays": 30,
+      "totalInvestment": 375000,
+      "badgeColor": "from-orange-600 to-red-600",
+      "description": "Premium wealth building tier for top performers",
+      "popular": true
+    },
+    {
+      "id": "vip-6",
+      "level": 6,
+      "name": "Motorola VIP 6",
+      "capital": 100000,
+      "dailyEarning": 26000,
+      "durationDays": 30,
+      "totalInvestment": 780000,
+      "badgeColor": "from-pink-600 to-rose-600",
+      "description": "Elite Motorola investor status with priority settlements"
+    },
+    {
+      "id": "vip-7",
+      "level": 7,
+      "name": "Motorola VIP 7",
+      "capital": 200000,
+      "dailyEarning": 54000,
+      "durationDays": 30,
+      "totalInvestment": 1620000,
+      "badgeColor": "from-fuchsia-600 to-purple-800",
+      "description": "Executive wealth tier with daily massive income"
+    },
+    {
+      "id": "vip-8",
+      "level": 8,
+      "name": "Motorola VIP 8",
+      "capital": 500000,
+      "dailyEarning": 140000,
+      "durationDays": 30,
+      "totalInvestment": 4200000,
+      "badgeColor": "from-violet-700 to-indigo-900",
+      "description": "Corporate partner investment plan with maximum yields"
+    },
+    {
+      "id": "vip-9",
+      "level": 9,
+      "name": "Motorola VIP 9",
+      "capital": 1000000,
+      "dailyEarning": 290000,
+      "durationDays": 30,
+      "totalInvestment": 8700000,
+      "badgeColor": "from-yellow-500 to-amber-700",
+      "description": "Institutional high-yield Motorola capital tier"
+    },
+    {
+      "id": "vip-10",
+      "level": 10,
+      "name": "Motorola VIP 10",
+      "capital": 2000000,
+      "dailyEarning": 600000,
+      "durationDays": 30,
+      "totalInvestment": 18000000,
+      "badgeColor": "from-emerald-500 via-teal-600 to-purple-900",
+      "description": "Ultimate Motorola VIP Crown Plan for top capitalists",
+      "popular": true
+    }
+  ],
+  "investments": [],
+  "transactions": [],
+  "adminSettings": {
+    "adminBankName": "KOLOMONI (Kolomoni MFB)",
+    "adminAccountNumber": "1100088701",
+    "adminAccountName": "MOTOROLA INVESTMENT PLATFORM OR EMEKA EMMANUEL CHIMDALU",
+    "adminUssdCode": "*999*1100088701#",
+    "supportWhatsApp": "+2348149021882",
+    "supportTelegramGroup": "https://t.me/motorolainvestmentplatform",
+    "whatsappChannelLink": "https://chat.whatsapp.com/motorola_official_channel",
+    "telegramGroupLink": "https://t.me/motorolainvestmentplatform",
+    "supportLiveChatUrl": "https://t.me/motorolainvestmentplatform",
+    "supportPhone": "08149021882",
+    "supportEmail": "emmanuelchidalu67@gmail.com",
+    "welcomeBonusAmount": 700,
+    "dailyClaimAmount": 50,
+    "minDepositAmount": 3000,
+    "minWithdrawalAmount": 700,
+    "withdrawalFeePercent": 15,
+    "withdrawalOpenHour": 8,
+    "withdrawalCloseHour": 18,
+    "tier1BonusPercent": 20,
+    "tier2BonusPercent": 3,
+    "tier3BonusPercent": 2,
+    "tier4BonusPercent": 1,
+    "tier5BonusPercent": 1,
+    "customReferralLink": "https://motorola-investment-platform.ai.studio/?ref={CODE}",
+    "announcementMessage": "Welcome to Motorola Investment Platform! Fund your account via KOLOMONI bank transfer, select a VIP investment plan to earn daily payouts, and enjoy instant withdrawals!",
+    "announcementEnabled": true
+  },
+  "spinRewards": [
+    {
+      "id": "1",
+      "label": "₦200",
+      "amount": 200,
+      "color": "#6B21A8",
+      "textColor": "#FFFFFF",
+      "probability": 0.3
+    },
+    {
+      "id": "2",
+      "label": "₦500",
+      "amount": 500,
+      "color": "#10B981",
+      "textColor": "#FFFFFF",
+      "probability": 0.25
+    },
+    {
+      "id": "3",
+      "label": "₦900",
+      "amount": 900,
+      "color": "#F59E0B",
+      "textColor": "#FFFFFF",
+      "probability": 0.2
+    },
+    {
+      "id": "4",
+      "label": "₦1,000",
+      "amount": 1000,
+      "color": "#3B82F6",
+      "textColor": "#FFFFFF",
+      "probability": 0.15
+    },
+    {
+      "id": "5",
+      "label": "₦2,000",
+      "amount": 2000,
+      "color": "#EC4899",
+      "textColor": "#FFFFFF",
+      "probability": 0.07
+    },
+    {
+      "id": "6",
+      "label": "₦5,000",
+      "amount": 5000,
+      "color": "#8B5CF6",
+      "textColor": "#FFFFFF",
+      "probability": 0.02
+    },
+    {
+      "id": "7",
+      "label": "Try Again",
+      "amount": 0,
+      "color": "#64748B",
+      "textColor": "#FFFFFF",
+      "probability": 0.005
+    },
+    {
+      "id": "8",
+      "label": "₦10,000",
+      "amount": 10000,
+      "color": "#10B981",
+      "textColor": "#FFFFFF",
+      "probability": 0.005
+    }
+  ],
+  "notifications": [],
+  "topUpCodes": [
+    {
+      "id": "code-1",
+      "code": "FREE5000",
+      "amount": 5000,
+      "maxRedemptions": 200,
+      "timesRedeemed": 15,
+      "redeemedUserIds": [],
+      "createdAt": "2026-09-02T20:37:58.118Z",
+      "isActive": true
+    },
+    {
+      "id": "code-2",
+      "code": "MOTOROLA1000",
+      "amount": 1000,
+      "maxRedemptions": 500,
+      "timesRedeemed": 42,
+      "redeemedUserIds": [],
+      "createdAt": "2026-09-02T20:37:58.118Z",
+      "isActive": true
+    },
+    {
+      "id": "code-3",
+      "code": "PALMPAY2000",
+      "amount": 2000,
+      "maxRedemptions": 100,
+      "timesRedeemed": 8,
+      "redeemedUserIds": [],
+      "createdAt": "2026-09-02T20:37:58.118Z",
+      "isActive": true
+    }
+  ]
+}

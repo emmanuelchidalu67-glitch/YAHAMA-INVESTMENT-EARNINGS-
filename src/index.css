@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@layer base {
+  html, body {
+    background-color: #ffffff;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(224, 242, 254, 0.8) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(254, 243, 199, 0.7) 0px, transparent 50%),
+      radial-gradient(at 50% 50%, rgba(255, 255, 255, 0.95) 0px, transparent 60%),
+      radial-gradient(at 50% 100%, rgba(240, 249, 255, 0.8) 0px, transparent 50%),
+      linear-gradient(180deg, #ffffff 0%, #f8fbff 40%, #f0f7ff 100%);
+    background-attachment: fixed;
+    color: #0f172a;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+@layer utilities {
+  @keyframes marquee {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .animate-marquee {
+    display: flex;
+    width: max-content;
+    animation: marquee 30s linear infinite;
+  }
+
+  .hover\:pause:hover {
+    animation-play-state: paused;
+  }
+
+  /* Milky Diamond & Gold Luxury Table & Card Theme */
+  .diamond-gold-card {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 50%, #f0f7ff 100%);
+    border: 2px solid #bae6fd;
+    box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.15), 0 0 15px 0 rgba(251, 191, 36, 0.15);
+  }
+
+  .diamond-gold-header {
+    background: linear-gradient(90deg, #0284c7 0%, #0369a1 50%, #b45309 100%);
+    border-bottom: 2px solid #f59e0b;
+    color: #ffffff;
+  }
+
+  .diamond-gold-row {
+    background: #ffffff;
+    border-bottom: 1px solid #e0f2fe;
+  }
+
+  .diamond-gold-row:hover {
+    background: #f0f9ff;
+  }
+
+  /* Custom Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #38bdf8;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #f59e0b;
+  }
+}

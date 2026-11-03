@@ -1,0 +1,6 @@
+{
+  "name": "Motorola Investment Platform",
+  "description": "A high-performance Nigerian fintech investment web app inspired by PalmPay, featuring VIP levels 1-10, daily earnings, deposit & withdrawal management, 5-tier referral rewards, spin wheel, 70+ Nigerian banks, and admin controls.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
