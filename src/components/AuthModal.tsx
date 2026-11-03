@@ -5,19 +5,22 @@ import {
   Lock,
   Phone,
   Mail,
-  Sparkles,
   AlertCircle,
   ShieldCheck,
   Check,
-  Key,
   Eye,
   EyeOff,
+  User as UserIcon,
+  ArrowRight,
   Globe,
+  ChevronDown,
+  Search,
 } from 'lucide-react';
 import { User, AdminSettings } from '../types';
 import { ApiService } from '../services/api';
-import { useLanguage } from '../context/LanguageContext';
 import { soundService } from '../utils/sound';
+import { COUNTRIES, CountryCode, DEFAULT_COUNTRY } from '../data/countries';
+import yamahaBrandLogo from '../assets/images/yamaha_brand_logo_1793646961486.jpg';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -34,17 +37,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onAuthSuccess,
   adminSettings,
 }) => {
-  const { language, setLanguage, currentLanguage, languages } = useLanguage();
   const [mode, setMode] = useState<'login' | 'signup'>(initialMode);
   const welcomeAmount = adminSettings?.welcomeBonusAmount || 700;
 
   // Sign Up Form State
   const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
-  const [otpCode, setOtpCode] = useState('');
-  const [generatedOtp, setGeneratedOtp] = useState<string | null>(null);
-  const [otpCountdown, setOtpCountdown] = useState(0);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [referralCode, setReferralCode] = useState('');
@@ -54,54 +53,52 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
 
+  // Country code
+  const [selectedCountry, setSelectedCountry] = useState<CountryCode>(DEFAULT_COUNTRY);
+  const [showCountryModal, setShowCountryModal] = useState(false);
+  const [countrySearch, setCountrySearch] = useState('');
+
   // Login Form State
   const [loginIdentifier, setLoginIdentifier] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [otpSentNotice, setOtpSentNotice] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState('');
 
   if (!isOpen) return null;
 
-  // Handle Send Simulated OTP
-  const handleSendOtp = () => {
-    soundService.playClick();
-    if (!phone || phone.trim().length < 10) {
-      setErrorMsg('Please enter a valid phone number before requesting OTP.');
-      return;
-    }
-
-    setErrorMsg('');
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    setGeneratedOtp(code);
-    setOtpSentNotice(`OTP Sent to ${phone}! Verification Code: ${code}`);
-    setOtpCountdown(60);
-
-    const timer = setInterval(() => {
-      setOtpCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
+  const filteredCountries = COUNTRIES.filter(
+    (c) =>
+      c.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
+      c.dialCode.includes(countrySearch) ||
+      c.code.toLowerCase().includes(countrySearch.toLowerCase())
+  );
 
   // Sign Up Submit
   const handleSignUpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     soundService.playClick();
     setErrorMsg('');
+    setSuccessMsg('');
 
-    if (!fullName || !phone || !email || !password || !confirmPassword) {
-      setErrorMsg('Please fill in all required sign up fields.');
+    if (!fullName.trim()) {
+      setErrorMsg('Please enter your full legal name.');
       return;
     }
 
-    if (password !== confirmPassword) {
-      setErrorMsg('Passwords do not match! Please check and try again.');
+    if (!phoneNumber.trim()) {
+      setErrorMsg('Please enter your phone number.');
+      return;
+    }
+
+    if (!email.trim() || !email.includes('@')) {
+      setErrorMsg('Please enter a valid email address.');
+      return;
+    }
+
+    if (!password) {
+      setErrorMsg('Please create an account password.');
       return;
     }
 
@@ -110,9 +107,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       return;
     }
 
-    if (generatedOtp && otpCode.trim() !== generatedOtp) {
-      setErrorMsg(`Invalid Phone Verification Code. Enter ${generatedOtp}`);
+    if (password !== confirmPassword) {
+      setErrorMsg('Passwords do not match. Please verify both passwords.');
       return;
+    }
+
+    let fullPhone = phoneNumber.trim().replace(/\s+/g, '');
+    if (!fullPhone.startsWith('+')) {
+      if (selectedCountry.code === 'NG' && fullPhone.startsWith('0')) {
+        fullPhone = fullPhone.substring(1);
+      }
+      fullPhone = `${selectedCountry.dialCode}${fullPhone}`;
     }
 
     setLoading(true);
@@ -120,17 +125,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     try {
       const res = await ApiService.register({
         fullName: fullName.trim(),
-        phone: phone.trim(),
-        email: email.trim(),
+        phone: fullPhone,
+        email: email.trim().toLowerCase(),
         password,
         referralCode: referralCode.trim() || undefined,
       });
 
-      soundService.playInvest();
-      onAuthSuccess(res.user);
-      onClose();
+      if (res && res.user) {
+        setSuccessMsg(`Welcome, ${res.user.fullName}! Entering platform...`);
+        soundService.playInvest();
+        setTimeout(() => {
+          onAuthSuccess(res.user);
+          onClose();
+        }, 350);
+      }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Registration failed');
+      setErrorMsg(err.message || 'Registration failed. Please check your details.');
     } finally {
       setLoading(false);
     }
@@ -141,9 +151,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     e.preventDefault();
     soundService.playClick();
     setErrorMsg('');
+    setSuccessMsg('');
 
-    if (!loginIdentifier || !loginPassword) {
-      setErrorMsg('Please fill in both phone/email and password.');
+    if (!loginIdentifier.trim()) {
+      setErrorMsg('Please enter your registered phone number or email.');
+      return;
+    }
+
+    if (!loginPassword) {
+      setErrorMsg('Please enter your account password.');
       return;
     }
 
@@ -154,295 +170,329 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         identifier: loginIdentifier.trim(),
         password: loginPassword,
       });
-      soundService.playInvest();
-      onAuthSuccess(res.user);
-      onClose();
+
+      if (res && res.user) {
+        setSuccessMsg(`Login successful! Entering platform...`);
+        soundService.playInvest();
+        setTimeout(() => {
+          onAuthSuccess(res.user);
+          onClose();
+        }, 350);
+      }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Login failed');
+      setErrorMsg(
+        err.message || 'Login failed. Only registered members can sign in. Please verify your phone/email or create a new account.'
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/75 backdrop-blur-sm animate-fadeIn">
-      {/* Milky Diamond, Sky Blue & Gold Theme Modal */}
-      <div className="bg-white text-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl relative overflow-hidden border-2 border-sky-200 max-h-[92vh] flex flex-col">
-        {/* Top Sky Blue & Gold Accent Bar */}
-        <div className="absolute top-0 left-0 right-0 h-2.5 bg-gradient-to-r from-sky-500 via-amber-400 to-blue-600"></div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn font-sans">
+      <div className="w-full max-w-[390px] rounded-[32px] bg-[#0A0E0C] border-2 border-emerald-900/80 shadow-2xl shadow-black/90 p-5 sm:p-6 text-[#FFFDF7] relative overflow-hidden">
+        {/* Ambient Halos */}
+        <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-900/40 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-rose-950/40 rounded-full blur-2xl pointer-events-none" />
 
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+          className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-black/60 hover:bg-black/80 text-[#FFFDF7]/70 hover:text-white flex items-center justify-center transition-all cursor-pointer"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
 
-        {/* Mode Toggle Header */}
-        <div className="text-center mb-3 mt-1">
-          <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-400/20 via-sky-400/20 to-violet-400/20 text-slate-900 px-3 py-1 rounded-full text-xs font-black mb-2 border border-amber-300">
-            <Sparkles className="w-3.5 h-3.5 text-amber-500" /> YAMAHA OFFICIAL PORTAL
+        {/* Modal Brand Crest */}
+        <div className="text-center space-y-1.5 mb-4 relative z-10">
+          <div className="w-14 h-14 rounded-full p-0.5 mx-auto bg-gradient-to-tr from-[#D4AF37] via-emerald-700 to-[#7F1D1D] shadow-lg shadow-black/80">
+            <img
+              src={yamahaBrandLogo}
+              alt="YAMAHA"
+              className="w-full h-full object-cover rounded-full"
+            />
           </div>
-          <h2 className="text-xl font-black text-slate-900">
-            {mode === 'signup' ? 'Create Investment Account' : 'Welcome Back'}
+          <h2 className="text-base font-black text-[#D4AF37] uppercase">
+            YAMAHA INVESTMENT
           </h2>
-          <p className="text-xs text-slate-600 font-semibold mt-0.5">
-            {mode === 'signup'
-              ? `Register now & receive ₦${welcomeAmount} instant welcome bonus!`
-              : 'Sign in to access your portfolio & 24h yields'}
+          <p className="text-[10px] text-[#FFFDF7]/70 font-bold uppercase tracking-wider">
+            {mode === 'signup' ? 'Create Account & Claim ₦700' : 'Registered Member Sign In'}
           </p>
-
-          <div className="flex bg-sky-50 p-1 rounded-2xl mt-3 border border-sky-200">
-            <button
-              type="button"
-              onClick={() => {
-                soundService.playClick();
-                setMode('signup');
-                setErrorMsg('');
-              }}
-              className={`flex-1 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
-                mode === 'signup'
-                  ? 'bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-md'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Sign Up (₦{welcomeAmount} Bonus)
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                soundService.playClick();
-                setMode('login');
-                setErrorMsg('');
-              }}
-              className={`flex-1 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
-                mode === 'login'
-                  ? 'bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-md'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Sign In
-            </button>
-          </div>
         </div>
 
+        {/* Mode Toggle Table */}
+        <div className="p-1 rounded-full bg-black/80 border-2 border-emerald-900/80 flex items-center mb-4 relative z-10">
+          <button
+            type="button"
+            onClick={() => {
+              setMode('signup');
+              setErrorMsg('');
+              setSuccessMsg('');
+            }}
+            className={`flex-1 py-1.5 rounded-full text-[11px] font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+              mode === 'signup'
+                ? 'bg-gradient-to-r from-emerald-800 to-emerald-700 text-[#FFFDF7] shadow-md border border-[#D4AF37]'
+                : 'text-[#FFFDF7]/60 hover:text-[#FFFDF7]'
+            }`}
+          >
+            <UserCheck className="w-3.5 h-3.5 text-[#D4AF37]" />
+            <span>Create Account</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setMode('login');
+              setErrorMsg('');
+              setSuccessMsg('');
+            }}
+            className={`flex-1 py-1.5 rounded-full text-[11px] font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+              mode === 'login'
+                ? 'bg-gradient-to-r from-[#7F1D1D] to-[#991B1B] text-[#FFFDF7] shadow-md border border-[#D4AF37]'
+                : 'text-[#FFFDF7]/60 hover:text-[#FFFDF7]'
+            }`}
+          >
+            <Lock className="w-3.5 h-3.5 text-[#D4AF37]" />
+            <span>Sign In</span>
+          </button>
+        </div>
+
+        {/* Feedback */}
         {errorMsg && (
-          <div className="mb-3 p-3 rounded-2xl bg-rose-50 border-2 border-rose-200 text-xs font-black text-rose-800 flex items-center gap-2 shrink-0">
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+          <div className="mb-3 p-2.5 rounded-2xl bg-rose-950/80 text-rose-200 border border-rose-800 text-[11px] font-bold flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
             <span>{errorMsg}</span>
           </div>
         )}
 
-        {otpSentNotice && mode === 'signup' && (
-          <div className="mb-3 p-3 rounded-2xl bg-amber-50 border-2 border-amber-300 text-xs text-amber-950 flex items-center gap-2 shrink-0 font-black">
-            <ShieldCheck className="w-4 h-4 text-amber-600 shrink-0" />
-            <span>{otpSentNotice}</span>
+        {successMsg && (
+          <div className="mb-3 p-2.5 rounded-2xl bg-emerald-950/90 text-emerald-200 border border-emerald-600 text-[11px] font-bold flex items-center gap-2">
+            <Check className="w-4 h-4 text-[#D4AF37] shrink-0" />
+            <span>{successMsg}</span>
           </div>
         )}
 
-        {/* Scrollable Form Body */}
-        <div className="overflow-y-auto pr-1">
-          {mode === 'signup' ? (
-            <form onSubmit={handleSignUpSubmit} className="space-y-3">
-              <div>
-                <label className="block text-[11px] font-black text-slate-800 mb-1">
-                  Full Name *
-                </label>
-                <div className="relative">
-                  <UserCheck className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="text"
-                    required
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="e.g. Emmanuel Chidalu"
-                    className="w-full pl-9 pr-3 py-2.5 rounded-2xl border-2 border-sky-100 bg-sky-50/40 focus:bg-white focus:border-sky-500 text-xs text-slate-900 font-bold outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-black text-slate-800 mb-1">
-                  Phone Number (PalmPay / Bank) *
-                </label>
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <Phone className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                    <input
-                      type="tel"
-                      required
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="08149021882"
-                      className="w-full pl-9 pr-3 py-2.5 rounded-2xl border-2 border-sky-100 bg-sky-50/40 focus:bg-white focus:border-sky-500 text-xs text-slate-900 font-bold outline-none"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleSendOtp}
-                    disabled={otpCountdown > 0}
-                    className="px-3 py-2.5 rounded-2xl bg-sky-600 hover:bg-sky-500 text-white font-black text-[11px] disabled:opacity-50 cursor-pointer shadow-xs"
-                  >
-                    {otpCountdown > 0 ? `${otpCountdown}s` : 'Get OTP'}
-                  </button>
-                </div>
-              </div>
-
-              {generatedOtp && (
-                <div>
-                  <label className="block text-[11px] font-black text-slate-800 mb-1">
-                    Verification Code (OTP) *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={otpCode}
-                    onChange={(e) => setOtpCode(e.target.value)}
-                    placeholder="Enter 6-digit code"
-                    className="w-full px-3 py-2.5 rounded-2xl border-2 border-sky-300 bg-white text-xs font-mono font-black text-center text-slate-900 focus:border-sky-500 outline-none"
-                  />
-                </div>
-              )}
-
-              <div>
-                <label className="block text-[11px] font-black text-slate-800 mb-1">
-                  Email Address *
-                </label>
-                <div className="relative">
-                  <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="user@example.com"
-                    className="w-full pl-9 pr-3 py-2.5 rounded-2xl border-2 border-sky-100 bg-sky-50/40 focus:bg-white focus:border-sky-500 text-xs text-slate-900 font-bold outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-black text-slate-800 mb-1">Password *</label>
-                <div className="relative">
-                  <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type={showSignUpPassword ? 'text' : 'password'}
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="At least 6 characters"
-                    className="w-full pl-9 pr-9 py-2.5 rounded-2xl border-2 border-sky-100 bg-sky-50/40 focus:bg-white focus:border-sky-500 text-xs text-slate-900 font-bold outline-none"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowSignUpPassword(!showSignUpPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
-                  >
-                    {showSignUpPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-black text-slate-800 mb-1">
-                  Confirm Password *
-                </label>
-                <div className="relative">
-                  <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    required
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Repeat password"
-                    className="w-full pl-9 pr-9 py-2.5 rounded-2xl border-2 border-sky-100 bg-sky-50/40 focus:bg-white focus:border-sky-500 text-xs text-slate-900 font-bold outline-none"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
-                  >
-                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-black text-slate-800 mb-1">
-                  Referral Code (Optional)
-                </label>
+        {/* Sign Up Form */}
+        {mode === 'signup' && (
+          <form onSubmit={handleSignUpSubmit} className="space-y-2.5 relative z-10">
+            <div>
+              <label className="block text-[10.5px] font-black text-[#D4AF37] mb-1 pl-3">Full Legal Name</label>
+              <div className="relative">
+                <UserIcon className="w-4 h-4 text-emerald-400 absolute left-3.5 top-3" />
                 <input
                   type="text"
-                  value={referralCode}
-                  onChange={(e) => setReferralCode(e.target.value)}
-                  placeholder="e.g. MOTO-8890"
-                  className="w-full px-3 py-2.5 rounded-2xl border-2 border-sky-100 bg-sky-50/40 text-xs font-mono font-bold uppercase text-slate-900 focus:bg-white focus:border-sky-500 outline-none"
+                  required
+                  placeholder="e.g. Emmanuel Chidalu"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2.5 rounded-full bg-[#121B16] border-2 border-emerald-900 text-[#FFFDF7] placeholder-[#FFFDF7]/40 font-bold text-xs focus:border-[#D4AF37] outline-none"
                 />
               </div>
+            </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full mt-2 py-3 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-slate-950 font-black text-xs shadow-lg shadow-amber-200 disabled:opacity-50 cursor-pointer border border-amber-400 transition-all active:scale-95"
-              >
-                {loading ? 'Registering...' : `Complete Registration & Get ₦${welcomeAmount}`}
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleLoginSubmit} className="space-y-3">
-              <div>
-                <label className="block text-[11px] font-black text-slate-800 mb-1">
-                  Phone Number or Email
-                </label>
-                <div className="relative">
-                  <UserCheck className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="text"
-                    required
-                    value={loginIdentifier}
-                    onChange={(e) => setLoginIdentifier(e.target.value)}
-                    placeholder="Enter phone or email"
-                    className="w-full pl-9 pr-3 py-2.5 rounded-2xl border-2 border-sky-100 bg-sky-50/40 focus:bg-white focus:border-sky-500 text-xs text-slate-900 font-bold outline-none"
-                  />
-                </div>
+            <div>
+              <label className="block text-[10.5px] font-black text-[#D4AF37] mb-1 pl-3">Country & Phone</label>
+              <div className="flex items-center gap-1.5 p-1 rounded-full bg-[#121B16] border-2 border-emerald-900 focus-within:border-[#D4AF37]">
+                <button
+                  type="button"
+                  onClick={() => setShowCountryModal(true)}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-emerald-950 hover:bg-emerald-900 border border-emerald-700/60 text-[#FFFDF7] text-xs font-black shrink-0"
+                >
+                  <span>{selectedCountry.flag}</span>
+                  <span className="text-[#D4AF37]">{selectedCountry.dialCode}</span>
+                  <ChevronDown className="w-3 h-3 text-[#D4AF37]" />
+                </button>
+                <input
+                  type="tel"
+                  required
+                  placeholder="8149021882"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  className="flex-1 pr-3 py-1.5 bg-transparent text-[#FFFDF7] placeholder-[#FFFDF7]/40 font-bold text-xs outline-none"
+                />
               </div>
+            </div>
 
-              <div>
-                <label className="block text-[11px] font-black text-slate-800 mb-1">
-                  Account Password
-                </label>
-                <div className="relative">
-                  <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type={showLoginPassword ? 'text' : 'password'}
-                    required
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    className="w-full pl-9 pr-9 py-2.5 rounded-2xl border-2 border-sky-100 bg-sky-50/40 focus:bg-white focus:border-sky-500 text-xs text-slate-900 font-bold outline-none"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowLoginPassword(!showLoginPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
-                  >
-                    {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
+            <div>
+              <label className="block text-[10.5px] font-black text-[#D4AF37] mb-1 pl-3">Email Address</label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-emerald-400 absolute left-3.5 top-3" />
+                <input
+                  type="email"
+                  required
+                  placeholder="user@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2.5 rounded-full bg-[#121B16] border-2 border-emerald-900 text-[#FFFDF7] placeholder-[#FFFDF7]/40 font-bold text-xs focus:border-[#D4AF37] outline-none"
+                />
               </div>
+            </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full mt-2 py-3 rounded-2xl bg-gradient-to-r from-sky-600 via-sky-500 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-black text-xs shadow-lg shadow-sky-200 disabled:opacity-50 cursor-pointer border border-sky-400 transition-all active:scale-95"
-              >
-                {loading ? 'Signing In...' : 'Sign In to Account'}
-              </button>
-            </form>
-          )}
-        </div>
+            <div>
+              <label className="block text-[10.5px] font-black text-[#D4AF37] mb-1 pl-3">Password</label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-emerald-400 absolute left-3.5 top-3" />
+                <input
+                  type={showSignUpPassword ? 'text' : 'password'}
+                  required
+                  placeholder="Min. 6 characters"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-9 pr-9 py-2.5 rounded-full bg-[#121B16] border-2 border-emerald-900 text-[#FFFDF7] placeholder-[#FFFDF7]/40 font-bold text-xs focus:border-[#D4AF37] outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowSignUpPassword(!showSignUpPassword)}
+                  className="absolute right-3 top-3 text-[#FFFDF7]/60"
+                >
+                  {showSignUpPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[10.5px] font-black text-[#D4AF37] mb-1 pl-3">Confirm Password</label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-emerald-400 absolute left-3.5 top-3" />
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  required
+                  placeholder="Re-enter password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full pl-9 pr-9 py-2.5 rounded-full bg-[#121B16] border-2 border-emerald-900 text-[#FFFDF7] placeholder-[#FFFDF7]/40 font-bold text-xs focus:border-[#D4AF37] outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-3 text-[#FFFDF7]/60"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[10.5px] font-black text-[#D4AF37] mb-1 pl-3">Invite Code (Optional)</label>
+              <input
+                type="text"
+                placeholder="YAMA777"
+                value={referralCode}
+                onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                className="w-full px-4 py-2 rounded-full bg-[#121B16] border-2 border-emerald-900 text-[#FFFDF7] placeholder-[#FFFDF7]/40 font-mono text-center font-black text-xs uppercase outline-none focus:border-[#D4AF37]"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 mt-1 rounded-full bg-gradient-to-r from-emerald-800 via-emerald-700 to-[#7F1D1D] text-[#FFFDF7] font-black text-xs tracking-wider uppercase border-2 border-[#D4AF37] shadow-xl flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
+            >
+              <span>{loading ? 'Registering...' : `REGISTER & CLAIM ₦${welcomeAmount}`}</span>
+              <ArrowRight className="w-4 h-4 text-[#D4AF37]" />
+            </button>
+          </form>
+        )}
+
+        {/* Login Form */}
+        {mode === 'login' && (
+          <form onSubmit={handleLoginSubmit} className="space-y-3 relative z-10">
+            <div>
+              <label className="block text-[10.5px] font-black text-[#D4AF37] mb-1 pl-3">Registered Phone or Email</label>
+              <div className="relative">
+                <UserIcon className="w-4 h-4 text-rose-400 absolute left-3.5 top-3" />
+                <input
+                  type="text"
+                  required
+                  placeholder="Phone number or Email"
+                  value={loginIdentifier}
+                  onChange={(e) => setLoginIdentifier(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2.5 rounded-full bg-[#121B16] border-2 border-rose-950/80 text-[#FFFDF7] placeholder-[#FFFDF7]/40 font-bold text-xs focus:border-[#D4AF37] outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[10.5px] font-black text-[#D4AF37] mb-1 pl-3">Password</label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-rose-400 absolute left-3.5 top-3" />
+                <input
+                  type={showLoginPassword ? 'text' : 'password'}
+                  required
+                  placeholder="Enter password"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  className="w-full pl-9 pr-9 py-2.5 rounded-full bg-[#121B16] border-2 border-rose-950/80 text-[#FFFDF7] placeholder-[#FFFDF7]/40 font-bold text-xs focus:border-[#D4AF37] outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowLoginPassword(!showLoginPassword)}
+                  className="absolute right-3 top-3 text-[#FFFDF7]/60"
+                >
+                  {showLoginPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 mt-1 rounded-full bg-gradient-to-r from-[#7F1D1D] via-[#991B1B] to-emerald-800 text-[#FFFDF7] font-black text-xs tracking-wider uppercase border-2 border-[#D4AF37] shadow-xl flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
+            >
+              <span>{loading ? 'Authenticating...' : 'SIGN IN TO YAMAHA'}</span>
+              <ArrowRight className="w-4 h-4 text-[#D4AF37]" />
+            </button>
+          </form>
+        )}
       </div>
+
+      {/* Country Modal */}
+      {showCountryModal && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-fadeIn">
+          <div className="w-full max-w-xs rounded-3xl bg-[#0F1713] border-2 border-emerald-800 shadow-2xl p-4 text-[#FFFDF7] space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-emerald-900">
+              <h3 className="font-black text-xs text-[#D4AF37] uppercase flex items-center gap-1.5">
+                <Globe className="w-4 h-4 text-emerald-400" /> Country Dial Code
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowCountryModal(false)}
+                className="w-6 h-6 rounded-full bg-black/60 flex items-center justify-center text-[#FFFDF7]/70"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 text-emerald-400 absolute left-3 top-2" />
+              <input
+                type="text"
+                placeholder="Search country..."
+                value={countrySearch}
+                onChange={(e) => setCountrySearch(e.target.value)}
+                className="w-full pl-8 pr-3 py-1.5 rounded-full bg-black/60 border border-emerald-800 text-[#FFFDF7] text-xs font-bold outline-none"
+              />
+            </div>
+            <div className="max-h-60 overflow-y-auto space-y-1">
+              {filteredCountries.map((c) => (
+                <button
+                  key={`${c.code}-${c.dialCode}`}
+                  type="button"
+                  onClick={() => {
+                    setSelectedCountry(c);
+                    setShowCountryModal(false);
+                  }}
+                  className="w-full p-2 rounded-xl flex items-center justify-between text-xs font-bold hover:bg-emerald-950 text-[#FFFDF7]"
+                >
+                  <div className="flex items-center gap-2">
+                    <span>{c.flag}</span>
+                    <span>{c.name}</span>
+                  </div>
+                  <span className="text-[#D4AF37]">{c.dialCode}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

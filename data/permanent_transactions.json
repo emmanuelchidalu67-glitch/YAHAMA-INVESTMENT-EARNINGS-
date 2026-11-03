@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "id": "tx_wb_1793726366512",
+    "userId": "usr_1793726366512_39fo",
+    "userPhone": "08012345678",
+    "type": "welcome_bonus",
+    "amount": 700,
+    "status": "approved",
+    "adminNote": "YAMAHA Platform Welcome Registration Bonus",
+    "createdAt": "2026-11-03T17:19:26.512Z"
+  },
+  {
+    "id": "tx_wb_1793727150609",
+    "userId": "usr_1793727150609_2o0l",
+    "userPhone": "+2348039988776",
+    "type": "welcome_bonus",
+    "amount": 700,
+    "status": "approved",
+    "adminNote": "YAMAHA Platform Welcome Registration Bonus",
+    "createdAt": "2026-11-03T17:32:30.609Z"
+  }
+]

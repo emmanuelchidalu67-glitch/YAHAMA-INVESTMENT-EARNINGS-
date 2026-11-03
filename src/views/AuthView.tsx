@@ -11,18 +11,12 @@ import {
   Eye,
   EyeOff,
   User as UserIcon,
-  Award,
   ArrowRight,
-  Building2,
-  CheckCircle2,
-  FileCheck2,
-  ExternalLink,
-  X,
   BadgeCheck,
-  Stamp,
   Globe,
   ChevronDown,
-  ChevronRight,
+  Search,
+  X,
 } from 'lucide-react';
 import { User, AdminSettings } from '../types';
 import { ApiService } from '../services/api';
@@ -30,6 +24,7 @@ import yamahaBrandLogo from '../assets/images/yamaha_brand_logo_1793646961486.jp
 import cacCertImg from '../assets/images/cac_certificate_bg_1787077584316.jpg';
 import { useLanguage } from '../context/LanguageContext';
 import { soundService } from '../utils/sound';
+import { COUNTRIES, CountryCode, DEFAULT_COUNTRY } from '../data/countries';
 
 interface AuthViewProps {
   initialMode?: 'login' | 'signup';
@@ -42,19 +37,20 @@ export const AuthView: React.FC<AuthViewProps> = ({
   onAuthSuccess,
   adminSettings,
 }) => {
-  const { language, setLanguage, currentLanguage, languages, t } = useLanguage();
+  const { language, setLanguage, languages } = useLanguage();
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const [mode, setMode] = useState<'login' | 'signup'>(initialMode);
   const [showCacModal, setShowCacModal] = useState(false);
+  const [showCountryModal, setShowCountryModal] = useState(false);
+  const [countrySearch, setCountrySearch] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState<CountryCode>(DEFAULT_COUNTRY);
+
   const welcomeAmount = adminSettings?.welcomeBonusAmount || 700;
 
   // Sign Up State
   const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
-  const [otpCode, setOtpCode] = useState('');
-  const [generatedOtp, setGeneratedOtp] = useState<string | null>(null);
-  const [otpCountdown, setOtpCountdown] = useState(0);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [referralCode, setReferralCode] = useState('');
@@ -70,7 +66,7 @@ export const AuthView: React.FC<AuthViewProps> = ({
 
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [otpSentNotice, setOtpSentNotice] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState('');
 
   // Auto-fill referral code from URL if present
   useEffect(() => {
@@ -93,55 +89,58 @@ export const AuthView: React.FC<AuthViewProps> = ({
     }
   }, []);
 
-  // Handle Send Simulated OTP
-  const handleSendOtp = () => {
-    soundService.playClick();
-    if (!phone || phone.trim().length < 10) {
-      setErrorMsg('Please enter a valid phone number before requesting verification code.');
-      return;
-    }
+  // Filtered countries
+  const filteredCountries = COUNTRIES.filter(
+    (c) =>
+      c.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
+      c.dialCode.includes(countrySearch) ||
+      c.code.toLowerCase().includes(countrySearch.toLowerCase())
+  );
 
-    setErrorMsg('');
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    setGeneratedOtp(code);
-    setOtpSentNotice(`OTP Sent to ${phone}! Verification Code: ${code}`);
-    setOtpCountdown(60);
-
-    const timer = setInterval(() => {
-      setOtpCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
-
-  // Sign Up Submit
+  // Sign Up Submit - Directly creates account and unlocks platform inside immediately
   const handleSignUpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     soundService.playClick();
     setErrorMsg('');
+    setSuccessMsg('');
 
-    if (!fullName || !phone || !email || !password || !confirmPassword) {
-      setErrorMsg('Please complete all required fields.');
+    if (!fullName.trim()) {
+      setErrorMsg('Please enter your full legal name.');
       return;
     }
 
-    if (password !== confirmPassword) {
-      setErrorMsg('Passwords do not match! Please check and try again.');
+    if (!phoneNumber.trim()) {
+      setErrorMsg('Please enter your phone number.');
+      return;
+    }
+
+    if (!email.trim() || !email.includes('@')) {
+      setErrorMsg('Please enter a valid email address.');
+      return;
+    }
+
+    if (!password) {
+      setErrorMsg('Please create an account password.');
       return;
     }
 
     if (password.length < 6) {
-      setErrorMsg('Password must be at least 6 characters.');
+      setErrorMsg('Password must be at least 6 characters long.');
       return;
     }
 
-    if (generatedOtp && otpCode.trim() !== generatedOtp) {
-      setErrorMsg(`Invalid verification code. Enter ${generatedOtp}`);
+    if (password !== confirmPassword) {
+      setErrorMsg('Passwords do not match. Please verify both passwords.');
       return;
+    }
+
+    // Format phone: if user didn't type leading country code, prepend selected dial code
+    let fullPhone = phoneNumber.trim().replace(/\s+/g, '');
+    if (!fullPhone.startsWith('+')) {
+      if (selectedCountry.code === 'NG' && fullPhone.startsWith('0')) {
+        fullPhone = fullPhone.substring(1);
+      }
+      fullPhone = `${selectedCountry.dialCode}${fullPhone}`;
     }
 
     setLoading(true);
@@ -149,29 +148,43 @@ export const AuthView: React.FC<AuthViewProps> = ({
     try {
       const res = await ApiService.register({
         fullName: fullName.trim(),
-        phone: phone.trim(),
-        email: email.trim(),
+        phone: fullPhone,
+        email: email.trim().toLowerCase(),
         password,
         referralCode: referralCode.trim() || undefined,
       });
 
-      soundService.playInvest();
-      onAuthSuccess(res.user);
+      if (res && res.user) {
+        setSuccessMsg(`Welcome, ${res.user.fullName}! Entering platform...`);
+        soundService.playInvest();
+        // Immediately transition into the platform
+        setTimeout(() => {
+          onAuthSuccess(res.user);
+        }, 400);
+      } else {
+        throw new Error('Registration did not return a valid user profile.');
+      }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Registration failed. Please check your details and try again.');
+      setErrorMsg(err.message || 'Registration failed. An account with this phone or email may already exist.');
     } finally {
       setLoading(false);
     }
   };
 
-  // Login Submit
+  // Login Submit - Strictly authenticated against registered database
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     soundService.playClick();
     setErrorMsg('');
+    setSuccessMsg('');
 
-    if (!loginIdentifier || !loginPassword) {
-      setErrorMsg('Please provide your phone/email and account password.');
+    if (!loginIdentifier.trim()) {
+      setErrorMsg('Please enter your registered phone number or email.');
+      return;
+    }
+
+    if (!loginPassword) {
+      setErrorMsg('Please enter your account password.');
       return;
     }
 
@@ -182,71 +195,72 @@ export const AuthView: React.FC<AuthViewProps> = ({
         identifier: loginIdentifier.trim(),
         password: loginPassword,
       });
-      soundService.playInvest();
-      onAuthSuccess(res.user);
+
+      if (res && res.user) {
+        setSuccessMsg(`Login successful! Entering platform...`);
+        soundService.playInvest();
+        setTimeout(() => {
+          onAuthSuccess(res.user);
+        }, 400);
+      } else {
+        throw new Error('Login failed. Please verify credentials.');
+      }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Login failed. Invalid phone/email or password.');
+      setErrorMsg(
+        err.message || 'Login failed. Only registered members can sign in. Please verify your phone/email or create a new account.'
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="py-4 px-2 max-w-md mx-auto">
-      {/* CUTE MILKY DIAMOND, SKY BLUE & GOLD AUTH CARD */}
-      <div className="bg-white rounded-3xl border-2 border-sky-200 shadow-2xl shadow-sky-100/80 overflow-hidden relative">
-        {/* Top Floating Diamond Accents */}
-        <div className="absolute -top-10 -right-10 w-36 h-36 bg-sky-200/50 rounded-full blur-2xl pointer-events-none" />
-        <div className="absolute -bottom-10 -left-10 w-36 h-36 bg-amber-200/40 rounded-full blur-2xl pointer-events-none" />
+    <div className="min-h-[85vh] py-6 px-3 flex flex-col items-center justify-center font-sans antialiased">
+      {/* COMPACT AUTH BOX - Strict Palette: Dark Green, Dark Red, Milky, Black, Diamond, Gold, Salt White */}
+      <div className="w-full max-w-[390px] rounded-[32px] bg-[#0A0E0C] border-2 border-emerald-900/80 shadow-2xl shadow-black/90 p-5 sm:p-6 text-[#FFFDF7] relative overflow-hidden">
+        {/* Subtle Ambient Diamond & Color Halos */}
+        <div className="absolute -top-12 -right-12 w-36 h-36 bg-emerald-900/40 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -bottom-12 -left-12 w-36 h-36 bg-rose-950/40 rounded-full blur-2xl pointer-events-none" />
 
-        {/* TOP BAR: Language Selector & Official Seal */}
-        <div className="p-3 bg-gradient-to-r from-slate-950 via-[#0B0F17] to-slate-950 border-b border-amber-400/40 flex items-center justify-between gap-2 relative z-20">
-          <div className="flex items-center gap-1.5 text-[11px] font-black text-amber-300">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span className="tracking-tight">YAMAHA OFFICIAL PORTAL</span>
-          </div>
+        {/* TOP BAR: Language Capsule & CAC Verification */}
+        <div className="flex items-center justify-between gap-2 pb-3 mb-3 border-b border-emerald-950 relative z-10">
+          <button
+            type="button"
+            onClick={() => setShowCacModal(true)}
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/90 border border-emerald-700/60 text-[#D4AF37] text-[10px] font-black cursor-pointer hover:bg-emerald-900 transition-colors"
+          >
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <span>CAC RC-1849204</span>
+          </button>
 
-          {/* Prominent Language Selector for Registration/Login */}
+          {/* Language Selector */}
           <div className="relative">
             <button
               type="button"
-              onClick={() => {
-                soundService.playClick();
-                setLangDropdownOpen(!langDropdownOpen);
-              }}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-900 hover:bg-slate-800 text-white border border-amber-400/50 shadow-xs text-xs font-black transition-all cursor-pointer"
-              title="Change Language"
+              onClick={() => setLangDropdownOpen(!langDropdownOpen)}
+              className="flex items-center gap-1 px-3 py-1 rounded-full bg-black/60 border border-[#D4AF37]/50 text-[#FFFDF7] text-[10.5px] font-black cursor-pointer hover:border-[#D4AF37]"
             >
-              <Globe className="w-3.5 h-3.5 text-sky-400" />
-              <span>{currentLanguage.flag}</span>
-              <span className="uppercase text-[11px] font-black text-amber-200">{currentLanguage.code}</span>
-              <ChevronDown className="w-3 h-3 text-slate-400" />
+              <Globe className="w-3 h-3 text-[#D4AF37]" />
+              <span className="uppercase">{language}</span>
+              <ChevronDown className="w-3 h-3 text-[#D4AF37]" />
             </button>
 
             {langDropdownOpen && (
-              <div className="absolute right-0 top-full mt-1 w-64 rounded-2xl bg-white border-2 border-sky-200 shadow-2xl p-2 z-50 animate-fadeIn max-h-60 overflow-y-auto">
-                <div className="text-[10px] font-black text-slate-400 px-2 py-1 uppercase tracking-wider">
-                  Select Language
-                </div>
+              <div className="absolute right-0 top-8 z-50 w-36 rounded-2xl bg-[#0F1713] border-2 border-emerald-800 shadow-2xl py-1 max-h-48 overflow-y-auto">
                 {languages.map((l) => (
                   <button
                     key={l.code}
+                    type="button"
                     onClick={() => {
                       setLanguage(l.code);
-                      soundService.playClick();
                       setLangDropdownOpen(false);
                     }}
-                    className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
-                      l.code === language
-                        ? 'bg-sky-100 text-sky-950 font-black'
-                        : 'text-slate-700 hover:bg-sky-50 font-semibold'
+                    className={`w-full px-3 py-1.5 text-left text-[11px] font-bold flex items-center gap-2 hover:bg-emerald-950/80 cursor-pointer ${
+                      language === l.code ? 'text-[#D4AF37] bg-emerald-950' : 'text-[#FFFDF7]'
                     }`}
                   >
-                    <div className="flex items-center gap-2">
-                      <span>{l.flag}</span>
-                      <span>{l.nativeName}</span>
-                    </div>
-                    {l.code === language && <Check className="w-3.5 h-3.5 text-sky-700" />}
+                    <span>{l.flag}</span>
+                    <span>{l.name}</span>
                   </button>
                 ))}
               </div>
@@ -254,58 +268,43 @@ export const AuthView: React.FC<AuthViewProps> = ({
           </div>
         </div>
 
-        {/* HERO SECTION - Divine Luxury Brand Header (Silver, Gold, Diamond, White, Blue, Milky, Dark Red, Black, Light Violet) */}
-        <div className="p-6 bg-gradient-to-br from-slate-950 via-[#0B0F17] to-slate-900 text-white text-center relative overflow-hidden shadow-inner border-b-2 border-amber-400/30">
-          {/* Diamond and Violet ambient glows */}
-          <div className="absolute -top-10 -right-10 w-32 h-32 bg-sky-400/20 rounded-full blur-2xl pointer-events-none" />
-          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-violet-500/20 rounded-full blur-2xl pointer-events-none" />
-
-          <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-amber-400 via-slate-100 to-sky-300 p-0.5 mx-auto shadow-xl shadow-amber-500/20 ring-2 ring-violet-400/40 mb-3">
-            <div className="w-full h-full rounded-full overflow-hidden bg-slate-950 flex items-center justify-center">
-              <img
-                src={yamahaBrandLogo}
-                alt="YAMAHA Official Logo"
-                className="w-full h-full object-cover"
-              />
-            </div>
+        {/* BRAND LOGO & HEADER */}
+        <div className="text-center space-y-2 mb-4 relative z-10">
+          <div className="w-16 h-16 rounded-full p-0.5 mx-auto bg-gradient-to-tr from-[#D4AF37] via-emerald-700 to-[#7F1D1D] shadow-lg shadow-black/80 ring-2 ring-[#FFFDF7]/10">
+            <img
+              src={yamahaBrandLogo}
+              alt="YAMAHA"
+              className="w-full h-full object-cover rounded-full"
+            />
           </div>
-
-          <h1 className="text-lg sm:text-xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-white to-sky-200 drop-shadow-md uppercase">
-            {mode === 'signup' ? 'YAMAHA INVESTMENT EARNINGS INCOME' : 'YAMAHA Member Sign In'}
-          </h1>
-          <p className="text-xs text-amber-100/90 font-medium max-w-xs mx-auto mt-1">
-            {mode === 'signup'
-              ? `Claim your instant ₦${welcomeAmount} Welcome Bonus & start earning daily ₦800 yields.`
-              : 'Sign in to access your wallet, active VIP machines, and instant withdrawals.'}
-          </p>
-
-          <div className="mt-3 flex items-center justify-center gap-2 flex-wrap">
-            <button
-              type="button"
-              onClick={() => setShowCacModal(true)}
-              className="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 backdrop-blur-md text-amber-300 border border-amber-300/40 px-3 py-1 rounded-full text-[10.5px] font-black transition-all cursor-pointer"
-            >
-              <BadgeCheck className="w-3.5 h-3.5 text-amber-400" /> CAC Nigeria Verified (RC-1849204)
-            </button>
+          <div>
+            <h1 className="text-base sm:text-lg font-black tracking-tight text-[#D4AF37] uppercase">
+              YAMAHA INVESTMENT
+            </h1>
+            <p className="text-[10.5px] text-[#FFFDF7]/80 font-bold uppercase tracking-wider">
+              {mode === 'signup' ? 'Claim ₦700 Welcome Bonus' : 'Registered Member Portal'}
+            </p>
           </div>
         </div>
 
-        {/* AUTH MODE TOGGLE TABS */}
-        <div className="p-2 bg-sky-50/80 border-b-2 border-sky-100 flex gap-2">
+        {/* CIRCULAR MODE TOGGLE TABLE */}
+        <div className="p-1 rounded-full bg-black/80 border-2 border-emerald-900/80 flex items-center mb-4 relative z-10">
           <button
             type="button"
             onClick={() => {
               soundService.playClick();
               setMode('signup');
               setErrorMsg('');
+              setSuccessMsg('');
             }}
-            className={`flex-1 py-3 rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            className={`flex-1 py-2 rounded-full text-[11.5px] font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               mode === 'signup'
-                ? 'bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-md shadow-sky-200'
-                : 'bg-white text-slate-700 hover:text-sky-900 border border-sky-200'
+                ? 'bg-gradient-to-r from-emerald-800 to-emerald-700 text-[#FFFDF7] shadow-md border border-[#D4AF37]'
+                : 'text-[#FFFDF7]/60 hover:text-[#FFFDF7]'
             }`}
           >
-            <UserCheck className="w-4 h-4" /> Create Account / Register
+            <UserCheck className="w-3.5 h-3.5 text-[#D4AF37]" />
+            <span>Create Account</span>
           </button>
           <button
             type="button"
@@ -313,268 +312,355 @@ export const AuthView: React.FC<AuthViewProps> = ({
               soundService.playClick();
               setMode('login');
               setErrorMsg('');
+              setSuccessMsg('');
             }}
-            className={`flex-1 py-3 rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            className={`flex-1 py-2 rounded-full text-[11.5px] font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               mode === 'login'
-                ? 'bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-md shadow-sky-200'
-                : 'bg-white text-slate-700 hover:text-sky-900 border border-sky-200'
+                ? 'bg-gradient-to-r from-[#7F1D1D] to-[#991B1B] text-[#FFFDF7] shadow-md border border-[#D4AF37]'
+                : 'text-[#FFFDF7]/60 hover:text-[#FFFDF7]'
             }`}
           >
-            <Lock className="w-4 h-4" /> Sign In / Login
+            <Lock className="w-3.5 h-3.5 text-[#D4AF37]" />
+            <span>Sign In</span>
           </button>
         </div>
 
-        <div className="p-6">
-          {errorMsg && (
-            <div className="mb-4 p-3.5 rounded-2xl bg-rose-50 text-rose-900 border-2 border-rose-200 text-xs font-black flex items-start gap-2 animate-fadeIn">
-              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-              <span>{errorMsg}</span>
-            </div>
-          )}
+        {/* FEEDBACK NOTICES */}
+        {errorMsg && (
+          <div className="mb-3 p-3 rounded-2xl bg-rose-950/80 text-rose-200 border border-rose-800 text-[11px] font-bold flex items-start gap-2 animate-fadeIn">
+            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+            <span>{errorMsg}</span>
+          </div>
+        )}
 
-          {/* SIGN UP FORM */}
-          {mode === 'signup' && (
-            <form onSubmit={handleSignUpSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-black text-slate-800 mb-1">Full Legal Name</label>
-                <div className="relative">
-                  <UserIcon className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Chukwuma Obi"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 rounded-2xl border-2 border-sky-100 bg-sky-50/40 font-bold text-xs text-slate-900 focus:bg-white focus:border-sky-500 outline-none transition-colors"
-                  />
-                </div>
-              </div>
+        {successMsg && (
+          <div className="mb-3 p-3 rounded-2xl bg-emerald-950/90 text-emerald-200 border border-emerald-600 text-[11px] font-bold flex items-center gap-2 animate-fadeIn">
+            <Check className="w-4 h-4 text-[#D4AF37] shrink-0" />
+            <span>{successMsg}</span>
+          </div>
+        )}
 
-              <div>
-                <label className="block text-xs font-black text-slate-800 mb-1">
-                  Phone Number (PalmPay / OPay / Bank)
-                </label>
-                <div className="relative">
-                  <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
-                  <input
-                    type="tel"
-                    required
-                    placeholder="e.g. 08149021882"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="w-full pl-10 pr-24 py-3 rounded-2xl border-2 border-sky-100 bg-sky-50/40 font-bold text-xs text-slate-900 focus:bg-white focus:border-sky-500 outline-none transition-colors"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleSendOtp}
-                    disabled={otpCountdown > 0}
-                    className="absolute right-2 top-2 px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-[10px] disabled:opacity-50 cursor-pointer shadow-xs"
-                  >
-                    {otpCountdown > 0 ? `${otpCountdown}s` : 'Get OTP'}
-                  </button>
-                </div>
-              </div>
-
-              {otpSentNotice && (
-                <div className="p-3 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 text-xs font-black flex items-center justify-between animate-fadeIn">
-                  <span>{otpSentNotice}</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (generatedOtp) setOtpCode(generatedOtp);
-                    }}
-                    className="underline text-sky-800 text-[11px] font-black cursor-pointer"
-                  >
-                    Auto-Fill
-                  </button>
-                </div>
-              )}
-
-              {generatedOtp && (
-                <div>
-                  <label className="block text-xs font-black text-slate-800 mb-1">
-                    Verification Code (OTP)
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Enter 6-digit OTP code"
-                    value={otpCode}
-                    onChange={(e) => setOtpCode(e.target.value)}
-                    className="w-full px-4 py-3 rounded-2xl border-2 border-sky-300 bg-white font-mono text-center font-black tracking-widest text-sm text-slate-900 focus:border-sky-500 outline-none"
-                  />
-                </div>
-              )}
-
-              <div>
-                <label className="block text-xs font-black text-slate-800 mb-1">Email Address</label>
-                <div className="relative">
-                  <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
-                  <input
-                    type="email"
-                    required
-                    placeholder="e.g. user@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 rounded-2xl border-2 border-sky-100 bg-sky-50/40 font-bold text-xs text-slate-900 focus:bg-white focus:border-sky-500 outline-none transition-colors"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-black text-slate-800 mb-1">Password</label>
-                <div className="relative">
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
-                  <input
-                    type={showSignUpPassword ? 'text' : 'password'}
-                    required
-                    placeholder="At least 6 characters"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-10 pr-10 py-3 rounded-2xl border-2 border-sky-100 bg-sky-50/40 font-bold text-xs text-slate-900 focus:bg-white focus:border-sky-500 outline-none transition-colors"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowSignUpPassword(!showSignUpPassword)}
-                    className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600 cursor-pointer"
-                  >
-                    {showSignUpPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-black text-slate-800 mb-1">Confirm Password</label>
-                <div className="relative">
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
-                  <input
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    required
-                    placeholder="Re-enter password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full pl-10 pr-10 py-3 rounded-2xl border-2 border-sky-100 bg-sky-50/40 font-bold text-xs text-slate-900 focus:bg-white focus:border-sky-500 outline-none transition-colors"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600 cursor-pointer"
-                  >
-                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-black text-slate-800 mb-1">
-                  Referral Code (Optional)
-                </label>
+        {/* CIRCULAR FILLING TABLE FORM - SIGN UP */}
+        {mode === 'signup' && (
+          <form onSubmit={handleSignUpSubmit} className="space-y-3 relative z-10">
+            {/* Full Legal Name */}
+            <div>
+              <label className="block text-[11px] font-black text-[#D4AF37] mb-1 pl-3">
+                Full Legal Name
+              </label>
+              <div className="relative">
+                <UserIcon className="w-4 h-4 text-emerald-400 absolute left-3.5 top-3.5" />
                 <input
                   type="text"
-                  placeholder="Enter inviter code"
-                  value={referralCode}
-                  onChange={(e) => setReferralCode(e.target.value)}
-                  className="w-full px-4 py-3 rounded-2xl border-2 border-sky-100 bg-sky-50/40 font-bold text-xs text-slate-900 focus:bg-white focus:border-sky-500 outline-none uppercase font-mono transition-colors"
+                  required
+                  placeholder="e.g. Emmanuel Chidalu"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 rounded-full bg-[#121B16] border-2 border-emerald-900 text-[#FFFDF7] placeholder-[#FFFDF7]/40 font-bold text-xs focus:border-[#D4AF37] focus:bg-[#18231D] outline-none transition-all shadow-inner"
                 />
               </div>
+            </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-slate-950 font-black text-sm shadow-lg shadow-amber-200 flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 cursor-pointer border border-amber-400"
-              >
-                <span>{loading ? 'Creating Your Account...' : `Register & Claim ₦${welcomeAmount} Bonus`}</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </form>
-          )}
+            {/* Country Code & Phone Number Circular Filling Table */}
+            <div>
+              <label className="block text-[11px] font-black text-[#D4AF37] mb-1 pl-3">
+                Country & Phone Number
+              </label>
+              <div className="flex items-center gap-1.5 p-1 rounded-full bg-[#121B16] border-2 border-emerald-900 focus-within:border-[#D4AF37] transition-all shadow-inner">
+                {/* Country Code Selector Button */}
+                <button
+                  type="button"
+                  onClick={() => setShowCountryModal(true)}
+                  className="flex items-center gap-1 px-3 py-2 rounded-full bg-emerald-950 hover:bg-emerald-900 border border-emerald-700/60 text-[#FFFDF7] text-xs font-black shrink-0 cursor-pointer transition-colors"
+                  title="Select Country"
+                >
+                  <span className="text-sm">{selectedCountry.flag}</span>
+                  <span className="text-[#D4AF37]">{selectedCountry.dialCode}</span>
+                  <ChevronDown className="w-3 h-3 text-[#D4AF37]" />
+                </button>
 
-          {/* SIGN IN / LOGIN FORM */}
-          {mode === 'login' && (
-            <form onSubmit={handleLoginSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-black text-slate-800 mb-1">
-                  Phone Number or Email
-                </label>
-                <div className="relative">
-                  <UserIcon className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
-                  <input
-                    type="text"
-                    required
-                    placeholder="Enter phone or email"
-                    value={loginIdentifier}
-                    onChange={(e) => setLoginIdentifier(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 rounded-2xl border-2 border-sky-100 bg-sky-50/40 font-bold text-xs text-slate-900 focus:bg-white focus:border-sky-500 outline-none transition-colors"
-                  />
-                </div>
+                {/* Phone Input */}
+                <input
+                  type="tel"
+                  required
+                  placeholder="8149021882"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  className="flex-1 pr-4 py-2 bg-transparent text-[#FFFDF7] placeholder-[#FFFDF7]/40 font-bold text-xs outline-none"
+                />
               </div>
+            </div>
 
-              <div>
-                <label className="block text-xs font-black text-slate-800 mb-1">Account Password</label>
-                <div className="relative">
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
-                  <input
-                    type={showLoginPassword ? 'text' : 'password'}
-                    required
-                    placeholder="Enter your password"
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    className="w-full pl-10 pr-10 py-3 rounded-2xl border-2 border-sky-100 bg-sky-50/40 font-bold text-xs text-slate-900 focus:bg-white focus:border-sky-500 outline-none transition-colors"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowLoginPassword(!showLoginPassword)}
-                    className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600 cursor-pointer"
-                  >
-                    {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
+            {/* Email Address */}
+            <div>
+              <label className="block text-[11px] font-black text-[#D4AF37] mb-1 pl-3">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-emerald-400 absolute left-3.5 top-3.5" />
+                <input
+                  type="email"
+                  required
+                  placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 rounded-full bg-[#121B16] border-2 border-emerald-900 text-[#FFFDF7] placeholder-[#FFFDF7]/40 font-bold text-xs focus:border-[#D4AF37] focus:bg-[#18231D] outline-none transition-all shadow-inner"
+                />
               </div>
+            </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-sky-600 via-sky-500 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-black text-sm shadow-lg shadow-sky-200 flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 cursor-pointer border border-sky-400"
-              >
-                <span>{loading ? 'Authenticating...' : 'Sign In to Account'}</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </form>
-          )}
+            {/* Password */}
+            <div>
+              <label className="block text-[11px] font-black text-[#D4AF37] mb-1 pl-3">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-emerald-400 absolute left-3.5 top-3.5" />
+                <input
+                  type={showSignUpPassword ? 'text' : 'password'}
+                  required
+                  placeholder="At least 6 characters"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-10 pr-10 py-3 rounded-full bg-[#121B16] border-2 border-emerald-900 text-[#FFFDF7] placeholder-[#FFFDF7]/40 font-bold text-xs focus:border-[#D4AF37] focus:bg-[#18231D] outline-none transition-all shadow-inner"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowSignUpPassword(!showSignUpPassword)}
+                  className="absolute right-3.5 top-3.5 text-[#FFFDF7]/60 hover:text-[#FFFDF7]"
+                >
+                  {showSignUpPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Confirm Password */}
+            <div>
+              <label className="block text-[11px] font-black text-[#D4AF37] mb-1 pl-3">
+                Confirm Password
+              </label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-emerald-400 absolute left-3.5 top-3.5" />
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  required
+                  placeholder="Re-enter password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full pl-10 pr-10 py-3 rounded-full bg-[#121B16] border-2 border-emerald-900 text-[#FFFDF7] placeholder-[#FFFDF7]/40 font-bold text-xs focus:border-[#D4AF37] focus:bg-[#18231D] outline-none transition-all shadow-inner"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3.5 top-3.5 text-[#FFFDF7]/60 hover:text-[#FFFDF7]"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Referral Code (Optional) */}
+            <div>
+              <label className="block text-[11px] font-black text-[#D4AF37] mb-1 pl-3">
+                Invitation Code (Optional)
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. YAMA777"
+                value={referralCode}
+                onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                className="w-full px-4 py-2.5 rounded-full bg-[#121B16] border-2 border-emerald-900 text-[#FFFDF7] placeholder-[#FFFDF7]/40 font-mono text-center font-black text-xs uppercase focus:border-[#D4AF37] outline-none transition-all"
+              />
+            </div>
+
+            {/* Submit Register Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3.5 mt-2 rounded-full bg-gradient-to-r from-emerald-800 via-emerald-700 to-[#7F1D1D] hover:from-emerald-700 hover:to-[#991B1B] text-[#FFFDF7] font-black text-xs tracking-wider uppercase border-2 border-[#D4AF37] shadow-xl flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
+            >
+              <span>{loading ? 'Registering...' : `REGISTER & CLAIM ₦${welcomeAmount}`}</span>
+              <ArrowRight className="w-4 h-4 text-[#D4AF37]" />
+            </button>
+          </form>
+        )}
+
+        {/* CIRCULAR FILLING TABLE FORM - LOGIN */}
+        {mode === 'login' && (
+          <form onSubmit={handleLoginSubmit} className="space-y-3.5 relative z-10">
+            {/* Phone or Email */}
+            <div>
+              <label className="block text-[11px] font-black text-[#D4AF37] mb-1 pl-3">
+                Registered Phone or Email
+              </label>
+              <div className="relative">
+                <UserIcon className="w-4 h-4 text-rose-400 absolute left-3.5 top-3.5" />
+                <input
+                  type="text"
+                  required
+                  placeholder="Phone number or Email"
+                  value={loginIdentifier}
+                  onChange={(e) => setLoginIdentifier(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 rounded-full bg-[#121B16] border-2 border-rose-950/80 text-[#FFFDF7] placeholder-[#FFFDF7]/40 font-bold text-xs focus:border-[#D4AF37] focus:bg-[#18231D] outline-none transition-all shadow-inner"
+                />
+              </div>
+            </div>
+
+            {/* Password */}
+            <div>
+              <label className="block text-[11px] font-black text-[#D4AF37] mb-1 pl-3">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-rose-400 absolute left-3.5 top-3.5" />
+                <input
+                  type={showLoginPassword ? 'text' : 'password'}
+                  required
+                  placeholder="Enter your password"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  className="w-full pl-10 pr-10 py-3 rounded-full bg-[#121B16] border-2 border-rose-950/80 text-[#FFFDF7] placeholder-[#FFFDF7]/40 font-bold text-xs focus:border-[#D4AF37] focus:bg-[#18231D] outline-none transition-all shadow-inner"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowLoginPassword(!showLoginPassword)}
+                  className="absolute right-3.5 top-3.5 text-[#FFFDF7]/60 hover:text-[#FFFDF7]"
+                >
+                  {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Tip for Admin */}
+            <div className="p-2.5 rounded-2xl bg-black/60 border border-emerald-900/60 text-[10.5px] text-[#FFFDF7]/70 space-y-0.5">
+              <p className="font-bold text-[#D4AF37]">Official Access Notice:</p>
+              <p>Only registered accounts can log in. The verified admin portal is protected.</p>
+            </div>
+
+            {/* Submit Login Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3.5 mt-2 rounded-full bg-gradient-to-r from-[#7F1D1D] via-[#991B1B] to-emerald-800 hover:from-[#991B1B] hover:to-emerald-700 text-[#FFFDF7] font-black text-xs tracking-wider uppercase border-2 border-[#D4AF37] shadow-xl flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
+            >
+              <span>{loading ? 'Authenticating...' : 'SIGN IN TO YAMAHA'}</span>
+              <ArrowRight className="w-4 h-4 text-[#D4AF37]" />
+            </button>
+          </form>
+        )}
+
+        {/* Security Footer Notice */}
+        <div className="mt-4 pt-3 border-t border-emerald-950 text-center">
+          <p className="text-[10px] text-[#FFFDF7]/50 font-medium">
+            256-Bit SSL Encrypted • Fast PalmPay Bank Payouts • Instant Access
+          </p>
         </div>
       </div>
 
-      {/* CAC CERTIFICATE MODAL */}
-      {showCacModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-white rounded-3xl max-w-sm w-full p-5 space-y-4 shadow-2xl border-2 border-sky-200 relative">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <BadgeCheck className="w-5 h-5 text-amber-500" />
-                <h3 className="font-black text-sm text-slate-900">Official CAC Certificate</h3>
-              </div>
+      {/* COUNTRY CODE SELECTOR MODAL */}
+      {showCountryModal && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-fadeIn">
+          <div className="w-full max-w-sm rounded-3xl bg-[#0F1713] border-2 border-emerald-800 shadow-2xl p-4 text-[#FFFDF7] space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-emerald-900">
+              <h3 className="font-black text-xs text-[#D4AF37] uppercase flex items-center gap-1.5">
+                <Globe className="w-4 h-4 text-emerald-400" /> Select Country Code
+              </h3>
               <button
-                onClick={() => setShowCacModal(false)}
-                className="p-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600"
+                type="button"
+                onClick={() => setShowCountryModal(false)}
+                className="w-7 h-7 rounded-full bg-black/60 flex items-center justify-center text-[#FFFDF7]/70 hover:text-white"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-md">
-              <img
-                src={cacCertImg}
-                alt="YAMAHA CAC Certificate"
-                className="w-full h-auto object-cover"
+            {/* Search Input */}
+            <div className="relative">
+              <Search className="w-4 h-4 text-emerald-400 absolute left-3 top-2.5" />
+              <input
+                type="text"
+                placeholder="Search country or code..."
+                value={countrySearch}
+                onChange={(e) => setCountrySearch(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 rounded-full bg-black/60 border border-emerald-800 text-[#FFFDF7] text-xs font-bold outline-none focus:border-[#D4AF37]"
               />
             </div>
 
-            <div className="space-y-1 text-xs text-slate-700">
-              <p className="font-black text-slate-900">YAMAHA INVESTMENT EARNINGS INCOME LTD.</p>
-              <p className="font-mono text-[11px] text-slate-600">RC Number: RC-1849204</p>
-              <p className="text-[10px] text-emerald-700 font-bold">
-                ✓ Fully verified and licensed for PalmPay Yield Engines in Nigeria.
+            {/* Country List */}
+            <div className="max-h-64 overflow-y-auto space-y-1 pr-1">
+              {filteredCountries.map((c) => (
+                <button
+                  key={`${c.code}-${c.dialCode}`}
+                  type="button"
+                  onClick={() => {
+                    setSelectedCountry(c);
+                    setShowCountryModal(false);
+                    soundService.playClick();
+                  }}
+                  className={`w-full p-2.5 rounded-2xl flex items-center justify-between text-xs font-bold transition-colors cursor-pointer ${
+                    selectedCountry.code === c.code
+                      ? 'bg-emerald-950 text-[#D4AF37] border border-[#D4AF37]'
+                      : 'hover:bg-emerald-950/60 text-[#FFFDF7]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">{c.flag}</span>
+                    <span>{c.name}</span>
+                  </div>
+                  <span className="font-mono text-[#D4AF37] font-black">{c.dialCode}</span>
+                </button>
+              ))}
+              {filteredCountries.length === 0 && (
+                <p className="text-center text-xs text-[#FFFDF7]/50 py-4">No country matched search.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CAC CERTIFICATE MODAL */}
+      {showCacModal && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-3 sm:p-4 bg-black/90 backdrop-blur-md animate-fadeIn">
+          <div className="bg-[#FFFDF7] text-black border-2 border-emerald-800 rounded-3xl max-w-sm w-full p-5 space-y-4 shadow-2xl relative">
+            <button
+              onClick={() => setShowCacModal(false)}
+              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-black/10 hover:bg-black/20 text-black flex items-center justify-center"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="text-center space-y-1">
+              <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mx-auto text-emerald-800 font-black">
+                <BadgeCheck className="w-6 h-6" />
+              </div>
+              <h3 className="font-black text-sm text-emerald-950 uppercase">
+                YAMAHA INVESTMENT EARNINGS INCOME LTD.
+              </h3>
+              <p className="text-[11px] font-bold text-emerald-800">
+                Incorporated under Corporate Affairs Commission (CAC) Nigeria
               </p>
             </div>
+
+            <div className="rounded-2xl border-2 border-emerald-800 overflow-hidden shadow-inner">
+              <img
+                src={cacCertImg}
+                alt="CAC Registration"
+                className="w-full h-auto object-contain"
+              />
+            </div>
+
+            <div className="text-[11px] text-slate-700 space-y-1 bg-emerald-50/60 p-3 rounded-2xl border border-emerald-200">
+              <p><strong>RC Number:</strong> RC-1849204</p>
+              <p><strong>Status:</strong> Active &amp; Fully Compliant</p>
+              <p><strong>Licensed Operations:</strong> Financial Tech &amp; Daily Yield Investment Services</p>
+            </div>
+
+            <button
+              onClick={() => setShowCacModal(false)}
+              className="w-full py-3 rounded-full bg-emerald-800 hover:bg-emerald-900 text-[#FFFDF7] font-black text-xs uppercase"
+            >
+              Close Verification
+            </button>
           </div>
         </div>
       )}

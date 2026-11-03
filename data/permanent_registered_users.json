@@ -6,7 +6,7 @@
     "email": "emmanuelchidalu67@gmail.com",
     "isPhoneVerified": true,
     "passwordHash": "241166",
-    "referralCode": "MOTO777",
+    "referralCode": "YAMA777",
     "role": "admin",
     "vipLevel": 10,
     "balance": 1500000,
@@ -24,5 +24,43 @@
       "accountName": "EMMANUEL CHIDALU ADMIN",
       "updatedAt": "2026-06-01T08:00:00.000Z"
     }
+  },
+  {
+    "id": "usr_1793726366512_39fo",
+    "fullName": "Test User",
+    "phone": "08012345678",
+    "email": "testuser@example.com",
+    "isPhoneVerified": true,
+    "passwordHash": "password123",
+    "referralCode": "MOTO4942",
+    "role": "user",
+    "vipLevel": 1,
+    "balance": 700,
+    "totalInvested": 0,
+    "totalEarned": 0,
+    "totalReferralBonus": 0,
+    "totalWithdrawn": 0,
+    "welcomeBonusClaimed": true,
+    "spinsAvailable": 1,
+    "createdAt": "2026-11-03T17:19:26.512Z"
+  },
+  {
+    "id": "usr_1793727150609_2o0l",
+    "fullName": "Ngozi Okonjo",
+    "phone": "+2348039988776",
+    "email": "ngozi@example.com",
+    "isPhoneVerified": true,
+    "passwordHash": "password999",
+    "referralCode": "YAMA4604",
+    "role": "user",
+    "vipLevel": 1,
+    "balance": 700,
+    "totalInvested": 0,
+    "totalEarned": 0,
+    "totalReferralBonus": 0,
+    "totalWithdrawn": 0,
+    "welcomeBonusClaimed": true,
+    "spinsAvailable": 1,
+    "createdAt": "2026-11-03T17:32:30.609Z"
   }
 ]

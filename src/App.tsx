@@ -31,11 +31,13 @@ import { soundService } from './utils/sound';
 import { triggerHaptic, HapticPattern } from './utils/haptics';
 import { Crown, Sparkles, Check, AlertCircle, X, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { TopInstallBanner } from './components/TopInstallBanner';
+import { ShowcaseScreen } from './components/ShowcaseScreen';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<NavTab>('home');
   const [showHistory, setShowHistory] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
+  const [showShowcase, setShowShowcase] = useState<boolean>(true);
 
   // User & Data State
   const [user, setUser] = useState<User | null>(null);
@@ -289,6 +291,9 @@ export default function App() {
     localStorage.setItem('yamaha_user_id', authenticatedUser.id);
     localStorage.setItem('motorola_user_id', authenticatedUser.id);
     setAuthOpen(false);
+    setShowAdmin(false);
+    setShowHistory(false);
+    setActiveTab('home');
 
     // Refresh investments
     ApiService.getUserInvestments(authenticatedUser.id)
@@ -365,10 +370,15 @@ export default function App() {
     }
   };
 
+  // Showcase Screen: Firstly showcase app icon with name and description
+  if (showShowcase) {
+    return <ShowcaseScreen onComplete={() => setShowShowcase(false)} />;
+  }
+
   // If user is not logged in, render the dedicated AuthView page for Sign In & Registration with Top Banner
   if (!user) {
     return (
-      <div className="min-h-screen bg-transparent text-slate-900 font-sans flex flex-col antialiased selection:bg-sky-500 selection:text-white">
+      <div className="min-h-screen bg-[#070B09] text-[#FFFDF7] font-sans flex flex-col antialiased selection:bg-emerald-600 selection:text-white">
         <TopInstallBanner />
         <AuthView
           initialMode={authMode}
@@ -380,7 +390,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-transparent text-slate-900 font-sans flex flex-col antialiased selection:bg-sky-500 selection:text-white transition-colors duration-300">
+    <div className="min-h-screen bg-[#070B09] text-[#FFFDF7] font-sans flex flex-col antialiased selection:bg-emerald-600 selection:text-white transition-colors duration-300">
       {/* Removable Top Install Banner */}
       <TopInstallBanner />
 

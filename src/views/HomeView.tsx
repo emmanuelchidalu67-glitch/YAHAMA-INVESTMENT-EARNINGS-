@@ -213,27 +213,27 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </motion.div>
       )}
 
-      {/* Divine Luxury Main Balance Card: Silver, Gold, Diamond, White, Blue, Milky Ivory, Dark Red, Black, Light Violet */}
+      {/* Main Balance Card: Milky Ivory Surface with Dark Green and Gold Trim */}
       <motion.div
         variants={popInVariant}
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#FFFDF7] via-slate-50 to-[#F8FAFC] text-slate-900 p-5 shadow-2xl shadow-slate-900/10 border-2 border-amber-400/50 ring-2 ring-slate-200"
+        className="relative overflow-hidden rounded-3xl bg-[#FFFDF7] text-slate-950 p-5 shadow-2xl shadow-black/30 border-2 border-emerald-900 ring-2 ring-[#D4AF37]/50"
       >
-        {/* Diamond Crystalline Light Glow & Light Violet Nebula */}
-        <div className="absolute -top-14 -right-14 w-40 h-40 rounded-full bg-sky-200/45 blur-2xl pointer-events-none" />
-        <div className="absolute -bottom-14 -left-14 w-40 h-40 rounded-full bg-violet-200/40 blur-2xl pointer-events-none" />
-        <div className="absolute top-1/2 left-1/3 -translate-y-1/2 w-32 h-32 rounded-full bg-amber-200/30 blur-3xl pointer-events-none" />
+        {/* Subtle Ambient Diamond & Color Halos */}
+        <div className="absolute -top-14 -right-14 w-40 h-40 rounded-full bg-emerald-100/60 blur-2xl pointer-events-none" />
+        <div className="absolute -bottom-14 -left-14 w-40 h-40 rounded-full bg-rose-100/50 blur-2xl pointer-events-none" />
+        <div className="absolute top-1/2 left-1/3 -translate-y-1/2 w-32 h-32 rounded-full bg-amber-100/40 blur-3xl pointer-events-none" />
 
         {/* Card Header Info */}
         <div className="flex items-center justify-between mb-3 relative z-10">
           <div className="flex items-center gap-2.5">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-slate-950 via-slate-900 to-black p-0.5 border border-amber-400 shadow-md shadow-amber-500/20 flex items-center justify-center">
-              <div className="w-full h-full rounded-full bg-gradient-to-tr from-blue-700 via-sky-600 to-blue-500 flex items-center justify-center">
-                <Wallet className="w-5 h-5 text-white" />
+            <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#064E3B] via-emerald-800 to-[#7F1D1D] p-0.5 border border-[#D4AF37] shadow-md flex items-center justify-center">
+              <div className="w-full h-full rounded-full bg-[#0A0E0C] flex items-center justify-center">
+                <Wallet className="w-5 h-5 text-[#D4AF37]" />
               </div>
             </div>
             <div>
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>
+              <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping"></span>
                 Total Wallet Balance
               </p>
               <div className="flex items-baseline gap-1">
@@ -250,18 +250,18 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
           {/* VIP Badge & Verified Seal */}
           <div className="flex flex-col items-end">
-            <span className="bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 text-slate-950 font-black text-[10.5px] px-3.5 py-1 rounded-full flex items-center gap-1 shadow-md shadow-amber-300/40 border border-amber-400">
-              <Crown className="w-3.5 h-3.5 fill-slate-950" /> VIP {user ? user.vipLevel : 1}
+            <span className="bg-gradient-to-r from-emerald-800 to-[#7F1D1D] text-[#FFFDF7] font-black text-[10.5px] px-3.5 py-1 rounded-full flex items-center gap-1 shadow-md border border-[#D4AF37]">
+              <Crown className="w-3.5 h-3.5 fill-[#D4AF37] text-[#D4AF37]" /> VIP {user ? user.vipLevel : 1}
             </span>
-            <span className="text-[9.5px] text-rose-800 font-extrabold mt-1.5 flex items-center gap-1 bg-rose-50/80 px-2 py-0.5 rounded-full border border-rose-200">
-              <ShieldCheck className="w-3 h-3 text-emerald-600" /> PalmPay Verified
+            <span className="text-[9.5px] text-[#7F1D1D] font-extrabold mt-1.5 flex items-center gap-1 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
+              <ShieldCheck className="w-3 h-3 text-emerald-700" /> PalmPay Verified
             </span>
           </div>
         </div>
 
-        {/* Sub Metrics Row (Silver, Gold, Diamond, Milky) */}
-        <div className="grid grid-cols-2 gap-2.5 my-3 p-3 rounded-2xl bg-white/90 border-2 border-slate-200 text-xs shadow-sm relative z-10">
-          <div className="border-r border-slate-100 pr-2">
+        {/* Sub Metrics Row (Milky Surface with Dark Green and Dark Red Borders) */}
+        <div className="grid grid-cols-2 gap-2.5 my-3 p-3 rounded-2xl bg-white border-2 border-emerald-900/30 text-xs shadow-sm relative z-10">
+          <div className="border-r border-slate-200 pr-2">
             <p className="text-[9.5px] text-slate-500 font-black uppercase tracking-wider">Active Capital</p>
             <p className="font-black text-slate-950 text-sm mt-0.5">
               ₦{user ? user.totalInvested.toLocaleString() : '0.00'}
@@ -269,27 +269,27 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
           <div className="pl-1">
             <p className="text-[9.5px] text-slate-500 font-black uppercase tracking-wider">Total Earned Yields</p>
-            <p className="font-black text-emerald-700 text-sm mt-0.5">
+            <p className="font-black text-emerald-800 text-sm mt-0.5">
               ₦{user ? user.totalEarned.toLocaleString() : '0.00'}
             </p>
           </div>
         </div>
 
         {/* 24h Daily Check-in Claim Bar */}
-        <div className="my-3 p-3 rounded-2xl bg-gradient-to-r from-amber-100/70 via-white to-violet-100/60 border-2 border-amber-300 flex items-center justify-between relative z-10 shadow-xs">
+        <div className="my-3 p-3 rounded-2xl bg-gradient-to-r from-emerald-950 via-[#064E3B] to-[#7F1D1D] border-2 border-[#D4AF37] text-[#FFFDF7] flex items-center justify-between relative z-10 shadow-xs">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-400 to-yellow-500 text-slate-950 flex items-center justify-center shadow-xs border border-amber-300">
+            <div className="w-9 h-9 rounded-full bg-[#D4AF37] text-black flex items-center justify-center shadow-xs border border-white">
               <Gift className="w-4 h-4" />
             </div>
             <div>
-              <p className="text-xs font-black text-amber-950">Daily ₦{dailyClaimReward} Yield Reward</p>
-              <p className="text-[10px] text-slate-600 font-bold flex items-center gap-1">
+              <p className="text-xs font-black text-[#D4AF37]">Daily ₦{dailyClaimReward} Yield Reward</p>
+              <p className="text-[10px] text-[#FFFDF7]/80 font-bold flex items-center gap-1">
                 {user && user.totalInvested > 0 ? (
                   <>
-                    <Clock className="w-3 h-3 text-sky-600" /> {nextClaimTimer}
+                    <Clock className="w-3 h-3 text-[#D4AF37]" /> {nextClaimTimer}
                   </>
                 ) : (
-                  <span className="text-rose-900 font-extrabold">🔒 Requires Active VIP Investment</span>
+                  <span className="text-rose-200 font-extrabold">🔒 Requires Active VIP Investment</span>
                 )}
               </p>
             </div>
@@ -298,7 +298,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <button
               onClick={handleClaimDaily}
               disabled={claimLoading || !canClaimNow}
-              className="bg-gradient-to-r from-amber-400 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-slate-950 font-black text-xs px-3.5 py-2 rounded-full shadow-md transition-transform active:scale-95 disabled:opacity-50 shrink-0 cursor-pointer border border-amber-400"
+              className="bg-[#D4AF37] hover:bg-amber-300 text-black font-black text-xs px-3.5 py-2 rounded-full shadow-md transition-transform active:scale-95 disabled:opacity-50 shrink-0 cursor-pointer border border-white"
             >
               {claimLoading ? 'Claiming...' : `Claim ₦${dailyClaimReward}`}
             </button>
@@ -309,7 +309,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   onSelectPlan(vipPlans[0]);
                 }
               }}
-              className="bg-gradient-to-r from-blue-700 to-sky-600 hover:from-blue-600 hover:to-sky-500 text-white font-black text-[11px] px-3.5 py-2 rounded-full shadow-sm transition-transform active:scale-95 shrink-0 cursor-pointer border border-sky-400"
+              className="bg-emerald-800 hover:bg-emerald-700 text-[#FFFDF7] font-black text-[11px] px-3.5 py-2 rounded-full shadow-sm transition-transform active:scale-95 shrink-0 cursor-pointer border border-[#D4AF37]"
             >
               Unlock VIP
             </button>
@@ -323,58 +323,58 @@ export const HomeView: React.FC<HomeViewProps> = ({
         )}
 
         {/* 4 Circular Quick Action Buttons (Circular in Form) */}
-        <div className="grid grid-cols-4 gap-2 pt-3 relative z-10 border-t border-slate-200/80 mt-2">
-          {/* Circular Button: Deposit */}
+        <div className="grid grid-cols-4 gap-2 pt-3 relative z-10 border-t border-slate-200 mt-2">
+          {/* Circular Button: Deposit (Dark Green & Gold) */}
           <div className="flex flex-col items-center justify-center gap-1.5">
             <button
               onClick={onOpenDeposit}
-              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-slate-950 via-slate-900 to-black p-0.5 border-2 border-emerald-400 shadow-lg shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center cursor-pointer group"
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#0A0E0C] p-0.5 border-2 border-[#D4AF37] shadow-lg shadow-emerald-950/30 hover:scale-105 active:scale-95 transition-all flex items-center justify-center cursor-pointer group"
               title="Deposit Funds"
             >
-              <div className="w-full h-full rounded-full bg-gradient-to-br from-emerald-600 via-teal-500 to-emerald-700 flex items-center justify-center shadow-inner group-hover:rotate-6 transition-transform">
-                <ArrowDownLeft className="w-6 h-6 text-white stroke-[2.5]" />
+              <div className="w-full h-full rounded-full bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950 flex items-center justify-center shadow-inner group-hover:rotate-6 transition-transform">
+                <ArrowDownLeft className="w-6 h-6 text-[#D4AF37] stroke-[2.5]" />
               </div>
             </button>
             <span className="font-black text-xs text-slate-900 tracking-tight">Deposit</span>
           </div>
 
-          {/* Circular Button: Withdraw (Dark Red & Gold Highlight) */}
+          {/* Circular Button: Withdraw (Dark Red & Gold) */}
           <div className="flex flex-col items-center justify-center gap-1.5">
             <button
               onClick={onOpenWithdraw}
-              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-slate-950 via-slate-900 to-black p-0.5 border-2 border-rose-500 shadow-lg shadow-rose-500/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center cursor-pointer group"
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#0A0E0C] p-0.5 border-2 border-[#D4AF37] shadow-lg shadow-rose-950/30 hover:scale-105 active:scale-95 transition-all flex items-center justify-center cursor-pointer group"
               title="Withdraw Funds"
             >
-              <div className="w-full h-full rounded-full bg-gradient-to-br from-rose-700 via-red-600 to-rose-900 flex items-center justify-center shadow-inner group-hover:-rotate-6 transition-transform">
-                <ArrowUpRight className="w-6 h-6 text-amber-200 stroke-[2.5]" />
+              <div className="w-full h-full rounded-full bg-gradient-to-br from-[#7F1D1D] via-[#991B1B] to-[#450A0A] flex items-center justify-center shadow-inner group-hover:-rotate-6 transition-transform">
+                <ArrowUpRight className="w-6 h-6 text-[#FFFDF7] stroke-[2.5]" />
               </div>
             </button>
             <span className="font-black text-xs text-slate-900 tracking-tight">Withdraw</span>
           </div>
 
-          {/* Circular Button: Team (Royal Blue & Diamond Light) */}
+          {/* Circular Button: Team (Gold & Dark Green) */}
           <div className="flex flex-col items-center justify-center gap-1.5">
             <button
               onClick={onOpenTeam}
-              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-slate-950 via-slate-900 to-black p-0.5 border-2 border-sky-400 shadow-lg shadow-sky-500/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center cursor-pointer group"
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#0A0E0C] p-0.5 border-2 border-[#FFFDF7] shadow-lg shadow-black/30 hover:scale-105 active:scale-95 transition-all flex items-center justify-center cursor-pointer group"
               title="Referral Team"
             >
-              <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-700 via-sky-600 to-indigo-700 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
-                <Users className="w-6 h-6 text-white stroke-[2.5]" />
+              <div className="w-full h-full rounded-full bg-gradient-to-br from-[#D4AF37] via-[#B45309] to-[#064E3B] flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
+                <Users className="w-6 h-6 text-black stroke-[2.5]" />
               </div>
             </button>
             <span className="font-black text-xs text-slate-900 tracking-tight">Team</span>
           </div>
 
-          {/* Circular Button: History (Light Violet & Silver Shimmer) */}
+          {/* Circular Button: History (Black Obsidian & Dark Red) */}
           <div className="flex flex-col items-center justify-center gap-1.5">
             <button
               onClick={onOpenHistory}
-              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-slate-950 via-slate-900 to-black p-0.5 border-2 border-violet-400 shadow-lg shadow-violet-500/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center cursor-pointer group"
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#0A0E0C] p-0.5 border-2 border-[#D4AF37] shadow-lg shadow-black/30 hover:scale-105 active:scale-95 transition-all flex items-center justify-center cursor-pointer group"
               title="Transaction History"
             >
-              <div className="w-full h-full rounded-full bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-800 flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform">
-                <History className="w-6 h-6 text-violet-100 stroke-[2.5]" />
+              <div className="w-full h-full rounded-full bg-gradient-to-br from-black via-[#18231D] to-[#7F1D1D] flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform">
+                <History className="w-6 h-6 text-[#D4AF37] stroke-[2.5]" />
               </div>
             </button>
             <span className="font-black text-xs text-slate-900 tracking-tight">History</span>
@@ -382,33 +382,33 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
       </motion.div>
 
-      {/* PalmPay-Style Bill Payment & Recharge Hub (Buy Airtime & Buy Data Boxes Only) */}
+      {/* Bill Payment & Recharge Hub */}
       <motion.div
         variants={popInVariant}
-        className="p-4 rounded-3xl bg-gradient-to-br from-white via-slate-50 to-sky-50/40 border-2 border-slate-200/90 text-slate-900 shadow-md space-y-3"
+        className="p-4 rounded-3xl bg-[#FFFDF7] border-2 border-emerald-900 text-slate-900 shadow-md space-y-3"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-xl bg-purple-600 text-white font-black shadow-xs">
+            <div className="p-1.5 rounded-xl bg-emerald-950 text-[#D4AF37] font-black border border-emerald-700 shadow-xs">
               <Zap className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-black text-sm text-slate-900 leading-tight">
+              <h3 className="font-black text-sm text-slate-950 leading-tight">
                 Bill Payment &amp; Recharge
               </h3>
-              <p className="text-[10px] text-slate-500 font-semibold">
+              <p className="text-[10px] text-slate-600 font-semibold">
                 MTN • Airtel • Glo • 9mobile (Transfer Only)
               </p>
             </div>
           </div>
-          <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+          <span className="text-[10px] font-extrabold text-emerald-900 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-400">
             Official PalmPay Service
           </span>
         </div>
 
-        {/* Pure Buy Airtime & Buy Data Boxes (Zero GB text visible on Home) */}
+        {/* Buy Airtime & Buy Data Boxes (Dark Green and Dark Red Boxes) */}
         <div className="grid grid-cols-2 gap-3 pt-1">
-          {/* Box 1: Buy Airtime */}
+          {/* Box 1: Buy Airtime (Dark Green) */}
           <button
             type="button"
             onClick={() => {
@@ -417,23 +417,23 @@ export const HomeView: React.FC<HomeViewProps> = ({
               if (onOpenAirtime) onOpenAirtime();
               else if (onOpenVtu) onOpenVtu('airtime');
             }}
-            className="p-4 rounded-3xl bg-gradient-to-br from-amber-50 to-yellow-100/70 hover:from-amber-100 hover:to-yellow-200/80 border-2 border-amber-300 text-slate-950 flex flex-col justify-between items-start transition-all cursor-pointer shadow-xs active:scale-97 group text-left relative overflow-hidden"
+            className="p-4 rounded-3xl bg-gradient-to-br from-emerald-950 via-emerald-900 to-[#064E3B] hover:brightness-110 border-2 border-[#D4AF37] text-[#FFFDF7] flex flex-col justify-between items-start transition-all cursor-pointer shadow-md active:scale-97 group text-left relative overflow-hidden"
           >
-            <div className="absolute top-2.5 right-2.5 bg-amber-400 text-slate-950 text-[9px] font-black px-2 py-0.5 rounded-full shadow-xs uppercase tracking-wider">
+            <div className="absolute top-2.5 right-2.5 bg-[#D4AF37] text-black text-[9px] font-black px-2 py-0.5 rounded-full shadow-xs uppercase tracking-wider">
               ₦2 Off
             </div>
-            <div className="p-3 rounded-2xl bg-amber-400 text-slate-950 shadow-md shadow-amber-200/60 group-hover:scale-110 transition-transform mb-3">
-              <PhoneCall className="w-5 h-5 fill-slate-950" />
+            <div className="p-3 rounded-2xl bg-black/60 text-[#D4AF37] border border-emerald-800 shadow-md group-hover:scale-110 transition-transform mb-3">
+              <PhoneCall className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="font-black text-sm text-slate-950">Buy Airtime</h4>
-              <p className="text-[10.5px] text-slate-600 font-semibold mt-0.5">
+              <h4 className="font-black text-sm text-[#FFFDF7]">Buy Airtime</h4>
+              <p className="text-[10.5px] text-[#D4AF37] font-semibold mt-0.5">
                 Instant Recharge
               </p>
             </div>
           </button>
 
-          {/* Box 2: Buy Data */}
+          {/* Box 2: Buy Data (Dark Red) */}
           <button
             type="button"
             onClick={() => {
@@ -442,23 +442,24 @@ export const HomeView: React.FC<HomeViewProps> = ({
               if (onOpenData) onOpenData();
               else if (onOpenVtu) onOpenVtu('data');
             }}
-            className="p-4 rounded-3xl bg-gradient-to-br from-sky-50 to-blue-100/70 hover:from-sky-100 hover:to-blue-200/80 border-2 border-sky-300 text-slate-950 flex flex-col justify-between items-start transition-all cursor-pointer shadow-xs active:scale-97 group text-left relative overflow-hidden"
+            className="p-4 rounded-3xl bg-gradient-to-br from-[#7F1D1D] via-[#991B1B] to-[#450A0A] hover:brightness-110 border-2 border-[#D4AF37] text-[#FFFDF7] flex flex-col justify-between items-start transition-all cursor-pointer shadow-md active:scale-97 group text-left relative overflow-hidden"
           >
-            <div className="absolute top-2.5 right-2.5 bg-sky-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-xs uppercase tracking-wider">
+            <div className="absolute top-2.5 right-2.5 bg-[#D4AF37] text-black text-[9px] font-black px-2 py-0.5 rounded-full shadow-xs uppercase tracking-wider">
               Best Rates
             </div>
-            <div className="p-3 rounded-2xl bg-gradient-to-tr from-sky-600 to-blue-600 text-white shadow-md shadow-sky-200/60 group-hover:scale-110 transition-transform mb-3">
-              <Wifi className="w-5 h-5" />
+            <div className="p-3 rounded-2xl bg-black/60 text-[#FFFDF7] border border-rose-900 shadow-md group-hover:scale-110 transition-transform mb-3">
+              <Wifi className="w-5 h-5 text-[#D4AF37]" />
             </div>
             <div>
-              <h4 className="font-black text-sm text-slate-950">Buy Data</h4>
-              <p className="text-[10.5px] text-slate-600 font-semibold mt-0.5">
-                Cheap Bundles
+              <h4 className="font-black text-sm text-[#FFFDF7]">Buy Data</h4>
+              <p className="text-[10.5px] text-[#D4AF37] font-semibold mt-0.5">
+                Fast Bundles
               </p>
             </div>
           </button>
         </div>
       </motion.div>
+
 
       {/* Official Mobile App Install Button Card */}
       <motion.div variants={popInVariant}>
@@ -495,76 +496,76 @@ export const HomeView: React.FC<HomeViewProps> = ({
       <motion.div variants={popInVariant} className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-black text-base text-slate-900 flex items-center gap-1.5">
-              <TrendingUp className="w-5 h-5 text-sky-600" />
+            <h3 className="font-black text-base text-[#D4AF37] flex items-center gap-1.5">
+              <TrendingUp className="w-5 h-5 text-emerald-400" />
               YAMAHA VIP Investment Packages
             </h3>
-            <p className="text-xs text-slate-600 font-semibold">Daily ROI from VIP 1 to VIP 10</p>
+            <p className="text-xs text-[#FFFDF7]/70 font-semibold">Daily ROI from VIP 1 (₦3,500) to VIP 10</p>
           </div>
         </div>
 
-        {/* VIP Grid - Diamond & Gold Styled */}
+        {/* VIP Grid - Milky & Dark Green / Dark Red Palette */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
           {vipPlans.slice(0, 6).map((plan) => (
             <motion.div
               variants={popInVariant}
               key={plan.id}
-              className="p-4 rounded-3xl bg-white border-2 border-sky-100 hover:border-sky-300 shadow-md shadow-sky-100/60 transition-all relative overflow-hidden group text-slate-900"
+              className="p-4 rounded-3xl bg-[#FFFDF7] border-2 border-emerald-900/80 hover:border-[#D4AF37] shadow-lg transition-all relative overflow-hidden group text-slate-900"
             >
               {plan.popular && (
-                <span className="absolute top-0 right-0 bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black text-[9px] uppercase px-3 py-1 rounded-bl-2xl shadow-xs">
+                <span className="absolute top-0 right-0 bg-gradient-to-r from-emerald-800 to-[#7F1D1D] text-[#FFFDF7] font-black text-[9px] uppercase px-3 py-1 rounded-bl-2xl shadow-xs border-b border-l border-[#D4AF37]">
                   🔥 Popular
                 </span>
               )}
 
               <div className="flex items-center gap-2.5 mb-3">
-                <div className={`w-10 h-10 rounded-2xl bg-gradient-to-tr ${plan.badgeColor} text-white font-black text-sm flex items-center justify-center shadow-md`}>
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-950 via-emerald-800 to-[#7F1D1D] text-[#D4AF37] font-black text-sm flex items-center justify-center shadow-md border border-[#D4AF37]">
                   V{plan.level}
                 </div>
                 <div>
-                  <h4 className="font-black text-sm text-slate-900">{plan.name}</h4>
+                  <h4 className="font-black text-sm text-slate-950">{plan.name}</h4>
                   <p className="text-[11px] text-slate-600 font-semibold">{plan.durationDays} Days Contract</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 my-2 p-2.5 rounded-2xl bg-sky-50/60 border border-sky-200 text-xs">
+              <div className="grid grid-cols-2 gap-2 my-2 p-2.5 rounded-2xl bg-emerald-50/60 border border-emerald-200 text-xs">
                 <div>
                   <p className="text-[10px] text-slate-500 font-black uppercase">Capital</p>
-                  <p className="font-black text-slate-900 text-sm">₦{plan.capital.toLocaleString()}</p>
+                  <p className="font-black text-slate-950 text-sm">₦{plan.capital.toLocaleString()}</p>
                 </div>
                 <div>
                   <p className="text-[10px] text-slate-500 font-black uppercase">Daily Return</p>
-                  <p className="font-black text-emerald-700 text-sm">+₦{plan.dailyEarning.toLocaleString()}</p>
+                  <p className="font-black text-emerald-800 text-sm">+₦{plan.dailyEarning.toLocaleString()}</p>
                 </div>
-                <div className="col-span-2 pt-1 border-t border-sky-200 flex justify-between">
+                <div className="col-span-2 pt-1 border-t border-emerald-200 flex justify-between">
                   <span className="text-[10px] text-slate-600 font-bold">Total Revenue:</span>
-                  <span className="font-black text-amber-700">₦{plan.totalInvestment.toLocaleString()}</span>
+                  <span className="font-black text-[#7F1D1D]">₦{plan.totalInvestment.toLocaleString()}</span>
                 </div>
               </div>
 
               <button
                 onClick={() => onSelectPlan(plan)}
-                className="w-full mt-1 py-2.5 rounded-2xl bg-gradient-to-r from-sky-600 via-sky-500 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-black text-xs shadow-md shadow-sky-200 flex items-center justify-center gap-1 transition-transform active:scale-95 cursor-pointer border border-sky-400"
+                className="w-full mt-1 py-2.5 rounded-full bg-gradient-to-r from-emerald-800 via-emerald-700 to-[#7F1D1D] hover:from-emerald-700 hover:to-[#991B1B] text-[#FFFDF7] font-black text-xs shadow-md border border-[#D4AF37] flex items-center justify-center gap-1 transition-transform active:scale-95 cursor-pointer"
               >
                 Invest Now (₦{plan.capital.toLocaleString()})
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-4 h-4 text-[#D4AF37]" />
               </button>
             </motion.div>
           ))}
         </div>
       </motion.div>
 
-      {/* Top Investors Leaderboard - Diamond & Gold Table */}
+      {/* Top Investors Leaderboard - Milky & Dark Green / Dark Red */}
       <motion.div
         variants={popInVariant}
-        className="p-4 rounded-3xl bg-white border-2 border-sky-200 shadow-xl shadow-sky-100/60 space-y-3 text-slate-900"
+        className="p-4 rounded-3xl bg-[#FFFDF7] border-2 border-emerald-900 shadow-xl space-y-3 text-slate-900"
       >
-        <div className="flex items-center gap-2 pb-2 border-b border-sky-100">
-          <div className="p-2 rounded-2xl bg-amber-400 text-slate-950 font-black shadow-xs">
+        <div className="flex items-center gap-2 pb-2 border-b border-emerald-900/20">
+          <div className="p-2 rounded-2xl bg-emerald-950 text-[#D4AF37] font-black border border-emerald-800 shadow-xs">
             <Award className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="font-black text-sm text-slate-900">Top Yamaha Investors Leaderboard</h3>
+            <h3 className="font-black text-sm text-slate-950">Top Yamaha Investors Leaderboard</h3>
             <p className="text-xs text-slate-600 font-semibold">Highest daily payout earners</p>
           </div>
         </div>
@@ -573,18 +574,18 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {INITIAL_TOP_INVESTORS.map((inv, idx) => (
             <div
               key={inv.id}
-              className="flex items-center justify-between p-2.5 rounded-2xl bg-gradient-to-r from-sky-50/50 via-white to-amber-50/30 border border-sky-100 text-xs shadow-xs"
+              className="flex items-center justify-between p-2.5 rounded-2xl bg-white border border-emerald-900/20 text-xs shadow-xs"
             >
               <div className="flex items-center gap-2.5">
                 <span
                   className={`w-6 h-6 rounded-full font-black text-xs flex items-center justify-center shadow-xs ${
                     idx === 0
-                      ? 'bg-amber-400 text-slate-950'
+                      ? 'bg-[#D4AF37] text-black border border-black'
                       : idx === 1
                       ? 'bg-slate-200 text-slate-900'
                       : idx === 2
-                      ? 'bg-amber-600 text-white'
-                      : 'bg-sky-100 text-sky-900'
+                      ? 'bg-[#7F1D1D] text-white'
+                      : 'bg-emerald-100 text-emerald-900'
                   }`}
                 >
                   {idx + 1}
@@ -596,7 +597,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               </div>
 
               <div className="text-right">
-                <p className="font-black text-emerald-700">+₦{inv.payoutEarned.toLocaleString()}</p>
+                <p className="font-black text-emerald-800">+₦{inv.payoutEarned.toLocaleString()}</p>
                 <p className="text-[10px] text-slate-500 font-bold">Total: ₦{inv.totalInvested.toLocaleString()}</p>
               </div>
             </div>

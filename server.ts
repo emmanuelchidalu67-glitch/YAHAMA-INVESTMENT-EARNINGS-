@@ -336,7 +336,7 @@ function loadDB(): DatabaseSchema {
       email: 'emmanuelchidalu67@gmail.com',
       isPhoneVerified: true,
       passwordHash: '241166',
-      referralCode: 'MOTO777',
+      referralCode: 'YAMA777',
       role: 'admin',
       vipLevel: 10,
       balance: 1500000,
@@ -359,6 +359,9 @@ function loadDB(): DatabaseSchema {
   } else {
     adminUser.role = 'admin';
     adminUser.passwordHash = '241166';
+    if (adminUser.referralCode?.startsWith('MOTO')) {
+      adminUser.referralCode = 'YAMA777';
+    }
   }
 
   // 2. Build Merged Investments Map (Strict Zero-Deletion of Active, but Strict Permanent Honoring of Deletions)
@@ -641,13 +644,12 @@ app.post('/api/auth/register', (req, res) => {
     return res.status(400).json({ error: 'Email address already registered' });
   }
 
-  // Determine if admin (first user is admin or explicitly admin email)
-  const isFirstUser = db.users.length === 0;
+  // Strictly enforce that ONLY emmanuelchidalu67@gmail.com can be admin
   const cleanEmail = email.trim().toLowerCase();
-  const role = isFirstUser || cleanEmail.includes('admin') || cleanEmail === 'emmanuelchidalu67@gmail.com' ? 'admin' : 'user';
+  const role = cleanEmail === 'emmanuelchidalu67@gmail.com' ? 'admin' : 'user';
 
   const newUserId = `usr_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
-  const userRefCode = `MOTO${Math.floor(1000 + Math.random() * 9000)}`;
+  const userRefCode = `YAMA${Math.floor(1000 + Math.random() * 9000)}`;
 
   // Grant ₦700 Welcome Bonus
   const welcomeBonus = db.adminSettings.welcomeBonusAmount || 700;
@@ -714,7 +716,7 @@ app.post('/api/auth/login', (req, res) => {
 
   const user = findUserByPhoneOrEmail(identifier);
   if (!user) {
-    return res.status(400).json({ error: 'User account not found. Please register.' });
+    return res.status(400).json({ error: 'User account not found. Only registered members can sign in. Please create an account first.' });
   }
 
   if (user.passwordHash !== password) {
@@ -723,6 +725,13 @@ app.post('/api/auth/login', (req, res) => {
 
   if (user.isBanned) {
     return res.status(403).json({ error: 'Your account has been suspended. Please contact customer support.' });
+  }
+
+  // Ensure ONLY emmanuelchidalu67@gmail.com has admin role
+  if (user.email.toLowerCase() === 'emmanuelchidalu67@gmail.com') {
+    user.role = 'admin';
+  } else {
+    user.role = 'user';
   }
 
   return res.json({

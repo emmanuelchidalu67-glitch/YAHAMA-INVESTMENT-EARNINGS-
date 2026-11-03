@@ -50,7 +50,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   return (
     <nav
       id="bottom-navigation-bar"
-      className="fixed bottom-0 left-0 right-0 z-50 pointer-events-auto select-none bg-white/95 backdrop-blur-lg border-t-2 border-sky-200 shadow-[0_-4px_20px_rgba(14,165,233,0.15)] transition-all duration-200"
+      className="fixed bottom-0 left-0 right-0 z-50 pointer-events-auto select-none bg-[#070B09]/95 backdrop-blur-lg border-t-2 border-emerald-900/80 shadow-[0_-4px_25px_rgba(0,0,0,0.8)] transition-all duration-200"
       style={{
         transform: 'translateZ(0)',
         WebkitTransform: 'translateZ(0)',
@@ -70,14 +70,14 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               }}
               className={`relative flex flex-col items-center justify-center py-1 px-1 sm:px-2 rounded-2xl transition-all duration-150 cursor-pointer ${
                 isActive
-                  ? 'text-sky-700 font-black'
-                  : 'text-slate-500 hover:text-slate-900 font-semibold'
+                  ? 'text-[#D4AF37] font-black scale-105'
+                  : 'text-[#FFFDF7]/60 hover:text-[#FFFDF7] font-semibold'
               }`}
             >
               <div className="relative">
                 {tab.icon}
                 {tab.badge !== undefined && tab.badge > 0 ? (
-                  <span className="absolute -top-1.5 -right-2.5 bg-amber-400 text-slate-950 font-black text-[9px] min-w-4 h-4 px-1 rounded-full flex items-center justify-center border-2 border-white shadow-xs">
+                  <span className="absolute -top-1.5 -right-2.5 bg-[#991B1B] text-[#FFFDF7] font-black text-[9px] min-w-4 h-4 px-1 rounded-full flex items-center justify-center border border-[#D4AF37] shadow-xs">
                     {tab.badge}
                   </span>
                 ) : null}
@@ -85,7 +85,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
 
               <span
                 className={`text-[10px] sm:text-[11px] tracking-tight leading-tight mt-0.5 ${
-                  isActive ? 'font-black text-sky-900' : 'font-semibold text-slate-600'
+                  isActive ? 'font-black text-[#D4AF37]' : 'font-semibold text-[#FFFDF7]/70'
                 }`}
               >
                 {tab.label}
@@ -93,7 +93,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
 
               {/* Glowing Indicator for active tab */}
               {isActive ? (
-                <span className="w-4 sm:w-5 h-1 rounded-full bg-gradient-to-r from-amber-400 via-sky-500 to-amber-400 mt-0.5 shadow-sm transition-all" />
+                <span className="w-4 sm:w-5 h-1 rounded-full bg-gradient-to-r from-emerald-600 via-[#D4AF37] to-[#991B1B] mt-0.5 shadow-sm transition-all" />
               ) : (
                 <span className="w-4 sm:w-5 h-1 mt-0.5 opacity-0" />
               )}

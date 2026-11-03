@@ -148,16 +148,16 @@ export const Header: React.FC<HeaderProps> = ({
                 soundService.playClick();
                 setLangDropdownOpen(!langDropdownOpen);
               }}
-              className="flex items-center gap-1 px-2 py-1.5 rounded-2xl bg-sky-50 hover:bg-sky-100 text-slate-800 border-2 border-sky-200 shadow-xs transition-all active:scale-95 cursor-pointer"
-              title="Change Platform Language (English, Hausa, Yoruba, Igbo, French, Arabic, Spanish, etc.)"
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-black/60 hover:bg-emerald-950 text-[#D4AF37] border border-emerald-800 shadow-xs transition-all active:scale-95 cursor-pointer"
+              title="Change Platform Language"
             >
               <span className="text-sm leading-none">{currentLanguage.flag}</span>
-              <span className="font-black text-[11px] uppercase tracking-wider text-sky-900">
+              <span className="font-black text-[11px] uppercase tracking-wider text-[#FFFDF7]">
                 {currentLanguage.code}
               </span>
               <ChevronDown
-                className={`w-3 h-3 text-sky-600 transition-transform duration-200 ${
-                  langDropdownOpen ? 'rotate-180 text-sky-800' : ''
+                className={`w-3 h-3 text-[#D4AF37] transition-transform duration-200 ${
+                  langDropdownOpen ? 'rotate-180' : ''
                 }`}
               />
             </button>
@@ -279,11 +279,11 @@ export const Header: React.FC<HeaderProps> = ({
               soundService.playClick();
               onOpenSupport();
             }}
-            className="p-2 rounded-2xl bg-sky-50 hover:bg-sky-100 text-sky-800 border-2 border-sky-200 transition-all cursor-pointer relative"
+            className="p-2 rounded-full bg-black/60 hover:bg-emerald-950 text-[#D4AF37] border border-emerald-800 transition-all cursor-pointer relative"
             title="Customer Support"
           >
             <Headset className="w-4 h-4" />
-            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-500 rounded-full border-2 border-white animate-pulse"></span>
+            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-emerald-500 rounded-full border border-black animate-pulse"></span>
           </button>
 
           {/* Notification Icon */}
@@ -292,11 +292,11 @@ export const Header: React.FC<HeaderProps> = ({
               soundService.playClick();
               onOpenNotifications();
             }}
-            className="p-2 rounded-2xl bg-sky-50 hover:bg-sky-100 text-sky-800 border-2 border-sky-200 transition-all cursor-pointer relative"
+            className="p-2 rounded-full bg-black/60 hover:bg-emerald-950 text-[#D4AF37] border border-emerald-800 transition-all cursor-pointer relative"
             title="Notifications"
           >
             <Bell className="w-4 h-4" />
-            <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-amber-500 rounded-full"></span>
+            <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-[#991B1B] rounded-full"></span>
           </button>
 
           {/* User Status / Login Button */}
@@ -306,7 +306,7 @@ export const Header: React.FC<HeaderProps> = ({
                 soundService.playClick();
                 onOpenAuth();
               }}
-              className="bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-slate-950 font-black text-[11px] px-3 py-2 rounded-2xl shadow-md shadow-amber-200 transition-all active:scale-95 shrink-0 cursor-pointer border border-amber-400"
+              className="bg-gradient-to-r from-emerald-800 via-emerald-700 to-[#7F1D1D] hover:from-emerald-700 hover:to-[#991B1B] text-[#FFFDF7] font-black text-[11px] px-3.5 py-1.5 rounded-full shadow-md border border-[#D4AF37] transition-all active:scale-95 shrink-0 cursor-pointer"
             >
               {t('header.signIn', 'Sign In')}
             </button>
@@ -316,16 +316,16 @@ export const Header: React.FC<HeaderProps> = ({
                 soundService.playClick();
                 if (onOpenProfile) onOpenProfile();
               }}
-              className="flex items-center gap-1.5 bg-gradient-to-r from-emerald-50 to-teal-50 hover:from-emerald-100 hover:to-teal-100 px-2.5 py-1.5 rounded-2xl border border-emerald-300 text-[11px] shadow-xs cursor-pointer transition-all shrink-0"
+              className="flex items-center gap-1.5 bg-emerald-950/90 hover:bg-emerald-900 px-3 py-1.5 rounded-full border border-[#D4AF37] text-[11px] shadow-xs cursor-pointer transition-all shrink-0"
               title="Click to view wallet & profile"
             >
-              <Wallet className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <Wallet className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
               <AnimatedCounter
                 value={user.balance}
                 decimals={2}
                 startFromZero={true}
                 duration={1200}
-                className="font-mono font-black text-emerald-800 text-[11px]"
+                className="font-mono font-black text-[#FFFDF7] text-[11px]"
               />
             </div>
           )}
